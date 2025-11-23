@@ -14,12 +14,30 @@ router = APIRouter(
 )
 
 # ==========================
+#  Normalização de nomes
+# ==========================
+def normalize_name(name: str) -> str:
+    """
+    Normaliza nomes deixando cada palavra capitalizada.
+    Ex: 'mARIA eduARDA fACIO' -> 'Maria Eduarda Facio'
+    """
+    if not name:
+        return name
+
+    # Capitaliza cada palavra
+    return " ".join(word.capitalize() for word in name.split())
+
+
+# ==========================
 #  CREATE GUEST
 # ==========================
 @router.post("/", response_model=schemas.GuestResponse, status_code=status.HTTP_201_CREATED)
 def create_guest(guest: schemas.GuestCreate, db: Session = Depends(get_db)):
+    # Normaliza nome do convidado
+    normalized_name = normalize_name(guest.name)
+
     db_guest = models.Guest(
-        name=guest.name,
+        name=normalized_name,
         phone=guest.phone,
         email=guest.email,
     )
@@ -27,9 +45,13 @@ def create_guest(guest: schemas.GuestCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_guest)
 
-    # Criar acompanhantes
+    # Criar acompanhantes com nome normalizado
     for comp in guest.companions:
-        new_comp = models.Companion(name=comp.name, guest_id=db_guest.id)
+        normalized_comp_name = normalize_name(comp.name)
+        new_comp = models.Companion(
+            name=normalized_comp_name,
+            guest_id=db_guest.id
+        )
         db.add(new_comp)
 
     db.commit()
@@ -46,7 +68,8 @@ def list_guests(db: Session = Depends(get_db)):
 
 
 # ==========================
-#  FIND GUEST BY q (ID, name, phone, email)
+#  FIND GUEST BY q
+#  (ID, name, phone, email)
 # ==========================
 @router.get("/find", response_model=List[schemas.GuestResponse])
 def find_guests(q: str, db: Session = Depends(get_db)):
@@ -82,14 +105,22 @@ def get_guest(guest_id: int, db: Session = Depends(get_db)):
 # ==========================
 @router.patch("/{guest_id}", response_model=schemas.GuestResponse)
 def update_guest(guest_id: int, data: schemas.GuestUpdate, db: Session = Depends(get_db)):
-    guest = db.query(models.Guest).filter(models.Guest.id == guest_id).first()
+    guest = (
+        db.query(models.Guest)
+        .filter(models.Guest.id == guest_id)
+        .first()
+    )
+
     if not guest:
         raise HTTPException(404, "Convidado não encontrado.")
 
+    # Normaliza nome SE enviado
     if data.name is not None:
-        guest.name = data.name
+        guest.name = normalize_name(data.name)
+
     if data.phone is not None:
         guest.phone = data.phone
+
     if data.email is not None:
         guest.email = data.email
 

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Formatura Duda – Confirmação de Presença</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Google Fonts que existem (Open Sans e Allura).
+       The Seasons, Eyesome Script e Brasika você adiciona depois via @font-face
+       ou serviço de fonte, mas já deixei os nomes no font-family. -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Allura&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="page-bg-top"></div>
+  <div class="page-bg-bottom"></div>
+
+  <header class="hero">
+    <div class="hero-left">
+      <!-- Aqui você pode usar o “brasão” com a engrenagem + foto criança -->
+      <img src="img/logo-formatura.png" alt="Formatura Duda" class="hero-logo">
+    </div>
+    <div class="hero-right">
+      <h1 class="hero-title">Formatura Duda</h1>
+      <p class="hero-subtitle">Engenharia Computacional</p>
+
+      <div class="hero-date-card">
+
+        <div class="hero-date-block">
+          <span class="hero-date-label">SÁBADO</span>
+        </div>
+
+        <div class="hero-date-center">
+
+          <svg class="month-arc" width="170" height="65" viewBox="0 0 170 65">
+            <defs>
+              <!-- arco do texto (ajustado para ficar igual ao convite) -->
+              <path id="arcPath" d="M15,55 A70,70 0 0,1 155,55" />
+            </defs>
+
+            <text fill="#3b2a3a" font-family="The Seasons" font-size="14" letter-spacing="3">
+              <textPath href="#arcPath" startOffset="50%" text-anchor="middle">
+                FEVEREIRO
+              </textPath>
+            </text>
+          </svg>
+
+          <span class="hero-day">07</span>
+
+        </div>
+
+        <div class="hero-date-block">
+          <span class="hero-date-label">16 HORAS</span>
+        </div>
+
+      </div>
+
+
+      <p class="hero-location">
+        Rua Antônio Azalin Silva, 4<br>
+        Granjas Santo Antônio, Juiz de Fora – MG
+      </p>
+
+      <a class="hero-map-link" href="https://maps.app.goo.gl/qMJ5176xKYdCtGSC9?g_st=ipc" target="_blank" rel="noopener noreferrer">
+        <span class="hero-map-icon">📍</span>
+        Clique aqui para ver a localização
+      </a>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="card">
+      <h2 class="card-title">Confirmação de presença</h2>
+      <p class="card-text">
+        Favor confirmar presença até <strong>10/01</strong>.
+      </p>
+
+      <form id="rsvp-form" class="rsvp-form" novalidate>
+        <div class="form-group">
+          <label for="name">Seu nome completo *</label>
+          <input id="name" name="name" type="text" required placeholder="Ex: Maria Eduarda Ribeiro Facio">
+          <span class="input-error"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Telefone / WhatsApp *</label>
+          <input id="phone" name="phone" type="text" required placeholder="(00) 00000-0000">
+          <span class="input-error"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" placeholder="Opcional">
+        </div>
+
+        <div class="form-group companions-group">
+          <div class="companions-header">
+            <label>Acompanhantes</label>
+            <button type="button" id="add-companion" class="btn-secondary">
+              + Adicionar acompanhante
+            </button>
+          </div>
+          <p class="help-text">
+            Se for levar alguém, preencha o nome completo de cada acompanhante.
+          </p>
+          <div id="companions-container">
+            <!-- Campos de acompanhantes são adicionados dinamicamente via JS -->
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="btn-primary" id="submit-btn">
+            Confirmar presença
+          </button>
+          <p class="status-message" id="status-message"></p>
+        </div>
+      </form>
+    </section>
+
+    <section class="extra-info">
+      <h3 class="extra-title">OPEN BAR • OPEN FOOD</h3>
+      <!-- <p class="extra-text">
+        Cerveja, drinks, água e refrigerante para as crianças.
+      </p>
+      <p class="extra-text">
+        Cardápio do bar com drinks especiais da computação, igual ao do convite.
+      </p> -->
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Formatura Duda • Engenharia Computacional</p>
+  </footer>
+
+  <script src="js/rsvp.js"></script>
+</body>
+</html>

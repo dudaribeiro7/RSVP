@@ -1,0 +1,513 @@
+/* ============================= */
+/*  FONTES PERSONALIZADAS        */
+/* ============================= */
+
+@font-face {
+  font-family: "Brasika";
+  src: url("../fonts/brasika.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Eyesome Script";
+  src: url("../fonts/eyesome.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "The Seasons";
+  src: url("../fonts/theseasons.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+/* Paleta da festa */
+:root {
+  --bg: #fff2fa;
+  --pink: #d74499;
+  --orange: #ed5800;
+  --text: #3b2a3a;
+  --card-bg: #ffffff;
+  --border-soft: #f5cfe4;
+  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Resetzinho básico */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Open Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Aquarelas de fundo (você pode trocar pelos seus PNGs aquarelados) */
+.page-bg-top,
+.page-bg-bottom {
+  position: fixed;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.7;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.page-bg-top {
+  top: 0;
+  left: 0;
+  width: 11rem;
+  height: 11rem;
+  background-image: url("../img/aquarela-top.png");
+}
+
+.page-bg-bottom {
+  bottom: 0;
+  right: 0;
+  width: 11rem;
+  height: 11rem;
+  background-image: url("../img/aquarela-bottom.png");
+}
+
+/* Header / hero */
+
+.hero {
+  display: flex;
+  gap: 2rem;
+  padding: 2.5rem 7vw 1.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-left {
+  flex: 0 0 180px;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-logo {
+  max-width: 180px;
+  /* border-radius: 1000px; */
+}
+
+.hero-right {
+  max-width: 540px;
+  text-align: left;
+}
+
+.hero-save {
+  font-family: "The Seasons", "Times New Roman", serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: #222;
+}
+
+.hero-title {
+  /* margin-top: 0.25rem; */
+  font-family: "Eyesome Script", "Allura", cursive;
+  font-size: 2.6rem;
+  color: var(--pink);
+}
+
+.hero-subtitle {
+  font-family: "The Seasons", "Times New Roman", serif;
+  font-size: 1.1rem;
+  /* margin-top: 0.2rem; */
+}
+
+
+/* ===== BLOCO DA DATA ===== */
+
+.hero-date-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4rem;
+}
+
+/* Laterais (SÁBADO / 16 HORAS) */
+.hero-date-block {
+  padding: 0.3rem 0.5rem;
+  border-top: 1px solid var(--pink);
+  border-bottom: 1px solid var(--pink);
+  margin-left: -20px;
+  margin-right: -20px;
+}
+
+.hero-date-label {
+  font-family: "The Seasons", serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+}
+
+/* Bloco central */
+.hero-date-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ajustes do arco */
+.month-arc {
+  margin-bottom: -65px; 
+  overflow: visible;
+  align-items: center;
+}
+
+.month-arc text {
+  font-family: "The Seasons", serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+}
+
+/* O número 07 */
+.hero-day {
+  font-family: "Brasika", serif;
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--orange);
+}
+
+/* ======= */
+
+.hero-location {
+  margin-top: 3rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.hero-map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+  font-size: 0.92rem;
+  color: var(--orange);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.hero-map-link:hover {
+  text-decoration: underline;
+}
+
+.hero-map-icon {
+  font-size: 1.1rem;
+}
+
+/* Main layout */
+
+.main {
+  flex: 1;
+  padding: 0 7vw 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.card {
+  background: radial-gradient(circle at top left, #ffe5f3 0, #ffffff 50%, #ffe8d8 100%);
+  border-radius: 24px;
+  padding: 1.8rem 1.7rem 2rem;
+  box-shadow: var(--shadow-soft);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.card-title {
+  font-family: "Times New Roman", serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.card-text {
+  font-size: 0.96rem;
+  margin-bottom: 1.4rem;
+}
+
+/* Form */
+
+.rsvp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+input {
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  outline: none;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 2px rgba(215, 68, 153, 0.18);
+}
+
+/* Acompanhantes */
+
+.companions-group {
+  margin-top: 0.4rem;
+}
+
+.companions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.help-text {
+  font-size: 0.8rem;
+  color: #7a6276;
+}
+
+#companions-container {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.companion-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.companion-row input {
+  flex: 1;
+}
+
+.remove-companion {
+  border-radius: 999px;
+  border: 0;
+  background: rgba(215, 68, 153, 0.08);
+  color: var(--pink);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-companion:hover {
+  background: rgba(215, 68, 153, 0.2);
+}
+
+/* Buttons */
+
+.btn-primary {
+  border-radius: 999px;
+  border: 0;
+  padding: 0.8rem 1.6rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(90deg, var(--pink), var(--orange));
+  box-shadow: 0 10px 25px rgba(215, 68, 153, 0.35);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(215, 68, 153, 0.45);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-secondary {
+  border-radius: 999px;
+  border: 1px solid var(--pink);
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 242, 250, 0.9);
+  color: var(--pink);
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--pink);
+  color: #fff;
+}
+
+/* Form footer */
+
+.form-footer {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.status-message {
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+.status-message--error {
+  color: #c62828;
+}
+
+.status-message--success {
+  color: #2e7d32;
+}
+
+.input-error {
+  color: var(--pink);
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: none;
+}
+
+input.invalid {
+  border-color: var(--pink);
+}
+
+
+/* Extra info */
+
+.extra-info {
+  max-width: 720px;
+  /* margin: 0.5rem auto 0; */
+  text-align: center;
+}
+
+.extra-title {
+  font-family: "Brasika", "Times New Roman", serif;
+  font-size: 1.4rem;
+  color: var(--pink);
+  margin-bottom: 0.2rem;
+}
+
+.extra-text {
+  font-size: 0.9rem;
+}
+
+/* Footer */
+
+.footer {
+  margin-top: auto;
+  padding: 1.2rem 7vw 1.4rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6e5a6c;
+}
+
+/* Success page */
+
+.success-body {
+  background-color: var(--bg);
+}
+
+.success-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.success-card {
+  text-align: center;
+}
+
+.success-title {
+  font-family: "Eyesome Script", "Allura", cursive;
+  font-size: 2.3rem;
+  color: var(--pink);
+  margin-bottom: 0.6rem;
+}
+
+.success-text {
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.success-back {
+  margin-top: 1rem;
+}
+
+/* Responsivo */
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 1.8rem 6vw 1.2rem;
+  }
+
+  .hero-right {
+    text-align: center;
+  }
+
+  .hero-date-card {
+    justify-content: center;
+  }
+
+  .main {
+    padding: 0 5vw 2.2rem;
+  }
+
+  .card {
+    padding: 1.5rem 1.3rem 1.7rem;
+  }
+
+  .hero-left {
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-day {
+    font-size: 2.4rem;
+  }
+
+  input {
+    font-size: 0.9rem;
+  }
+}
