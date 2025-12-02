@@ -73,25 +73,25 @@
     <section class="card">
       <h2 class="card-title">Confirmação de presença</h2>
       <p class="card-text">
-        Favor confirmar presença até <strong>10/01</strong>.
+        Favor confirmar presença até <strong>25/01</strong>.
       </p>
 
-      <form id="rsvp-form" class="rsvp-form" novalidate>
+      <form id="rsvp-form" class="rsvp-form" novalidate autocomplete="on">
         <div class="form-group">
           <label for="name">Seu nome completo *</label>
-          <input id="name" name="name" type="text" required placeholder="Ex: Maria Eduarda Ribeiro Facio">
+          <input id="name" name="name" type="text" required placeholder="Ex: Maria Eduarda Ribeiro Facio" autocomplete="name">
           <span class="input-error"></span>
         </div>
 
         <div class="form-group">
           <label for="phone">Telefone / WhatsApp *</label>
-          <input id="phone" name="phone" type="text" required placeholder="(00) 00000-0000">
+          <input id="phone" name="phone" type="text" required placeholder="(00) 00000-0000" autocomplete="tel">
           <span class="input-error"></span>
         </div>
 
         <div class="form-group">
           <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" placeholder="Opcional">
+          <input id="email" name="email" type="email" placeholder="Opcional" autocomplete="email">
         </div>
 
         <div class="form-group companions-group">

@@ -19,7 +19,7 @@ app = FastAPI(
 # CORS liberado (depois podemos restringir para o domínio do seu site)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # depois troca isso pelo domínio do frontend
+    allow_origins=["http://127.0.0.1:5500"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

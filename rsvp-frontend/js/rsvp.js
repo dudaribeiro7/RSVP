@@ -1,7 +1,7 @@
 // js/rsvp.js
 
 // Troque depois pelo endereço do backend no Render
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 const form = document.getElementById("rsvp-form");
 const addCompanionBtn = document.getElementById("add-companion");
@@ -36,6 +36,7 @@ function createCompanionRow() {
   input.placeholder = "Nome completo do acompanhante";
   input.className = "companion-input";
   input.required = true;
+  input.autocomplete = "additional-name";
 
   // Mensagem de erro customizada
   const errorSpan = document.createElement("span");
@@ -122,16 +123,16 @@ if (form) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     setStatus("");
-
+    
     if (!validateForm()) {
       setStatus("Preencha os campos obrigatórios.", "error");
       return;
     }
-
+    
     const name = form.name.value.trim();
     const phone = form.phone.value.trim();
     const email = form.email.value.trim();
-
+    
     // Coleta dos acompanhantes válidos
     const companions = [];
     const companionInputs = companionsContainer.querySelectorAll(".companion-input");
@@ -139,14 +140,15 @@ if (form) {
       const value = input.value.trim();
       if (value) companions.push({ name: value });
     });
-
+    
     const payload = {
       name,
       phone,
       email: email || null,
       companions
     };
-
+    console.log("Payload:", payload);
+    
     submitBtn.disabled = true;
     submitBtn.textContent = "Enviando...";
 
@@ -157,6 +159,10 @@ if (form) {
         body: JSON.stringify(payload)
       });
 
+      console.log("Status da resposta:", response.status);
+      const text = await response.text();
+      console.log("Corpo da resposta:", text);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error("Erro ao enviar RSVP", errorData);
@@ -164,6 +170,7 @@ if (form) {
       }
 
       setStatus("");
+      console.log("Redirecionando para success.html...");
       window.location.href = "success.html";
 
     } catch (err) {
