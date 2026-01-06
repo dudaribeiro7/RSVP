@@ -8,6 +8,8 @@ from app.database import Base, engine
 from app.routers import guests
 from app.routers import companions
 
+import os
+
 # Cria as tabelas no banco (para dev; em prod você pode usar migrações)
 Base.metadata.create_all(bind=engine)
 
@@ -16,10 +18,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
+origins = [
+    o.strip()
+    for o in os.getenv("FRONTEND_ORIGINS", "http://127.0.0.1:5500").split(",")
+    if o.strip()
+]
+
 # CORS liberado (depois podemos restringir para o domínio do seu site)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

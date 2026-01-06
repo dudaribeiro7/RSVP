@@ -3,6 +3,7 @@ services:
     name: rsvp-backend
     env: python
     plan: free
+    rootDir: rsvp-backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
@@ -10,6 +11,10 @@ services:
         fromDatabase:
           name: rsvp-db
           property: connectionString
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: FRONTEND_ORIGINS
+        value: "http://127.0.0.1:5500,https://dudaribeiro7.github.io"
 
 databases:
   - name: rsvp-db
