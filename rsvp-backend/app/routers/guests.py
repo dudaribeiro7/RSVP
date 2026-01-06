@@ -30,6 +30,14 @@ router = APIRouter(
     tags=["Guests"],
 )
 
+def ensure_utc(dt):
+    if not dt:
+        return dt
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
 # ==========================
 #  Normalização de nomes
 # ==========================
@@ -86,7 +94,11 @@ def list_guests(
     db: Session = Depends(get_db),
     admin: None = Depends(require_admin),
 ):
-    return db.query(models.Guest).all()
+    guests = db.query(models.Guest).all()
+    for g in guests:
+        g.responded_at = ensure_utc(g.responded_at)
+    return guests
+
 
 
 
