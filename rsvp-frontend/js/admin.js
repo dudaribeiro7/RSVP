@@ -6,7 +6,8 @@ const els = {
   status: document.getElementById("status"),
 
   btnRefresh: document.getElementById("btn-refresh"),
-  btnExport: document.getElementById("btn-export"),
+  btnExportDocx: document.getElementById("btn-export-docx"),
+  btnExportPdf: document.getElementById("btn-export-pdf"),
   btnLogout: document.getElementById("btn-logout"),
 
   search: document.getElementById("search"),
@@ -277,40 +278,6 @@ async function loadGuests() {
   }));
 }
 
-function toCsvRows(guests) {
-  const header = ["id","name","phone","rsvp_status","responded_at","note","companions"];
-  const rows = guests.map(g => ([
-    g.id,
-    g.name,
-    g.phone,
-    g.rsvp_status,
-    g.responded_at,
-    (g.note || "").replace(/\r?\n/g, " "),
-    getCompanionsText(g),
-  ]));
-  return [header, ...rows];
-}
-
-function downloadCsv(filename, rows) {
-  const escapeCsv = (v) => {
-    const s = String(v ?? "");
-    if (/[",\n]/.test(s)) return `"${s.replaceAll('"', '""')}"`;
-    return s;
-  };
-
-  const csv = rows.map(r => r.map(escapeCsv).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-
 async function init() {
   try {
     await loadGuests();
@@ -322,17 +289,51 @@ async function init() {
   }
 }
 
+/* ===== Docs ===== */
+function downloadBlob(filename, blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function exportConfirmed(kind) {
+  const ext = kind === "pdf" ? "pdf" : "docx";
+  const url = `${API_BASE_URL}/guests/export/confirmed.${ext}`;
+
+  setStatus("Gerando exportação...", "info");
+
+  const res = await fetch(url, { headers: authedHeaders() });
+
+  if (res.status === 401) {
+    clearToken();
+    openLogin("PIN inválido.");
+    throw new Error("Não autorizado.");
+  }
+
+  if (!res.ok) {
+    const t = await res.text().catch(() => "");
+    throw new Error(`Erro ao exportar (HTTP ${res.status}). ${t}`);
+  }
+
+  const blob = await res.blob();
+  const ts = new Date().toISOString().slice(0, 19).replaceAll(":", "-");
+  downloadBlob(`confirmados-${ts}.${ext}`, blob);
+
+  setStatus("Exportação concluída ✅", "ok");
+}
+
 /* ===== Events ===== */
 els.btnRefresh?.addEventListener("click", init);
 els.search?.addEventListener("input", () => applyAndRender());
 els.hideEmptyNotes?.addEventListener("change", () => applyAndRender());
 els.hideNoCompanions?.addEventListener("change", () => applyAndRender());
-
-els.btnExport?.addEventListener("click", () => {
-  const rows = toCsvRows(allGuests);
-  const ts = new Date().toISOString().slice(0, 19).replaceAll(":", "-");
-  downloadCsv(`rsvp-${ts}.csv`, rows);
-});
+els.btnExportDocx?.addEventListener("click", () => exportConfirmed("docx"));
+els.btnExportPdf?.addEventListener("click", () => exportConfirmed("pdf"));
 
 els.btnLogout?.addEventListener("click", () => {
   clearToken();

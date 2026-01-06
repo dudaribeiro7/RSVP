@@ -13,6 +13,18 @@ from app import models, schemas
 
 from app.security import require_admin
 
+from io import BytesIO
+from datetime import datetime
+
+from fastapi.responses import StreamingResponse
+
+from docx import Document
+
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
+from reportlab.lib.styles import getSampleStyleSheet
+
+
 router = APIRouter(
     prefix="/guests",
     tags=["Guests"],
@@ -179,3 +191,89 @@ def delete_guest(
     db.delete(guest)
     db.commit()
     return
+
+
+def _confirmed_attendees_names(db: Session) -> list[str]:
+    # Pega quem confirmou (YES), inclui acompanhantes, e ordena alfabeticamente
+    confirmed_guests = (
+        db.query(models.Guest)
+        .filter(models.Guest.rsvp_status == schemas.RSVPStatus.YES.value)
+        .order_by(models.Guest.name.asc())
+        .all()
+    )
+
+    names: list[str] = []
+    for g in confirmed_guests:
+        if g.name:
+            names.append(g.name.strip())
+
+        # acompanhantes (só existem quando YES no seu create_guest)
+        for c in (g.companions or []):
+            if c.name:
+                names.append(c.name.strip())
+
+    # remove duplicados e ordena por casefold (alfabético “de verdade”)
+    unique = sorted(set(names), key=lambda s: s.casefold())
+    return unique
+
+
+@router.get("/export/confirmed.docx")
+def export_confirmed_docx(
+    db: Session = Depends(get_db),
+    admin: None = Depends(require_admin),
+):
+    names = _confirmed_attendees_names(db)
+
+    doc = Document()
+    doc.add_heading("Convidados confirmados", level=1)
+    doc.add_paragraph(f"Total: {len(names)}")
+    doc.add_paragraph(f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+
+    doc.add_paragraph("")  # espaço
+
+    for n in names:
+        doc.add_paragraph(n, style="List Number")
+
+    bio = BytesIO()
+    doc.save(bio)
+    bio.seek(0)
+
+    filename = f"confirmados-{datetime.now().strftime('%Y-%m-%d_%H-%M')}.docx"
+    return StreamingResponse(
+        bio,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get("/export/confirmed.pdf")
+def export_confirmed_pdf(
+    db: Session = Depends(get_db),
+    admin: None = Depends(require_admin),
+):
+    names = _confirmed_attendees_names(db)
+
+    bio = BytesIO()
+    styles = getSampleStyleSheet()
+
+    pdf = SimpleDocTemplate(bio, pagesize=A4, title="Convidados confirmados")
+    story = [
+        Paragraph("Convidados confirmados", styles["Title"]),
+        Spacer(1, 12),
+        Paragraph(f"Total: {len(names)}", styles["Normal"]),
+        Paragraph(f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}", styles["Normal"]),
+        Spacer(1, 16),
+    ]
+
+    items = [ListItem(Paragraph(n, styles["Normal"])) for n in names]
+    story.append(ListFlowable(items, bulletType="1"))  # lista numerada
+
+    pdf.build(story)
+
+    bio.seek(0)
+    filename = f"confirmados-{datetime.now().strftime('%Y-%m-%d_%H-%M')}.pdf"
+    return StreamingResponse(
+        bio,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
