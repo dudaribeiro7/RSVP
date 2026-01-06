@@ -1,0 +1,374 @@
+/* Admin mantém a paleta/variáveis do style.css */
+
+.admin-hero {
+  padding: 1.8rem 7vw 1.2rem;
+}
+
+.admin-hero__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.admin-title {
+  font-family: "Eyesome Script", "Allura", cursive;
+  font-size: 2.6rem;
+  color: var(--pink);
+  line-height: 1.1;
+}
+
+.admin-subtitle {
+  font-family: "The Seasons", "Times New Roman", serif;
+  letter-spacing: 0.04em;
+  margin-top: 0.25rem;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-filters {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+}
+
+.admin-search input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  outline: none;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.admin-search input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 2px rgba(215, 68, 153, 0.18);
+}
+
+.admin-toggles {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+.toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pink);
+}
+
+.admin-status {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  min-height: 1.2em;
+  color: #6e5a6c;
+}
+
+.admin-summary {
+  margin-top: 0.8rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+}
+
+.summary-card {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(245, 207, 228, 0.85);
+  border-radius: 18px;
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow-soft);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+}
+
+
+.summary-label {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.summary-value {
+  font-weight: 800;
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+
+.admin-main {
+  padding: 0 7vw 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.admin-card {
+  background: radial-gradient(circle at top left, #ffe5f3 0, #ffffff 50%, #ffe8d8 100%);
+  border-radius: 24px;
+  padding: 1.2rem 1.2rem 1.0rem;
+  box-shadow: var(--shadow-soft);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.admin-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.8rem;
+  margin-bottom: 0.7rem;
+}
+
+.admin-card__title {
+  font-family: "Times New Roman", serif;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border: 1px solid rgba(59, 42, 58, 0.18);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.pill--yes { color: #1b5e20; }
+.pill--no { color: #b71c1c; }
+.pill--maybe { color: #6a1b9a; }
+
+.table-wrap {
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 920px; /* mantém bonito no PC e dá scroll no celular */
+}
+
+.admin-table thead th {
+  text-align: left;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.75rem 0.65rem;
+  border-bottom: 1px solid rgba(59, 42, 58, 0.18);
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+  z-index: 2;
+}
+
+.admin-table tbody td {
+  padding: 0.75rem 0.65rem;
+  border-bottom: 1px solid rgba(59, 42, 58, 0.10);
+  vertical-align: top;
+  font-size: 0.93rem;
+}
+
+.admin-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.name-cell {
+  font-weight: 800;
+}
+
+.meta-badge {
+  display: inline-flex;
+  margin-top: 0.28rem;
+  font-size: 0.78rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(215, 68, 153, 0.10);
+  border: 1px solid rgba(215, 68, 153, 0.16);
+  color: var(--pink);
+  font-weight: 700;
+}
+
+.note {
+  white-space: pre-wrap;
+  color: #4b3a4a;
+}
+
+.note.empty {
+  color: rgba(75, 58, 74, 0.45);
+  font-style: italic;
+}
+
+.companions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.companion-pill {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(237, 88, 0, 0.10);
+  border: 1px solid rgba(237, 88, 0, 0.18);
+  color: #6b2b00;
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+
+.companion-empty {
+  color: rgba(75, 58, 74, 0.45);
+  font-style: italic;
+}
+
+.admin-footer {
+  max-width: 1100px;
+  margin: 0 auto;
+  color: #6e5a6c;
+  font-size: 0.85rem;
+  text-align: center;
+  padding-top: 0.5rem;
+}
+
+/* Desktop layout */
+@media (min-width: 900px) {
+  .admin-hero__inner {
+    grid-template-columns: 0.9fr 1.1fr;
+    align-items: start;
+  }
+  .admin-filters {
+    grid-template-columns: 1fr;
+  }
+  .summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.summary-value--name {
+  font-size: 1rem;
+  font-weight: 800;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* corta bonito se for enorme */
+}
+
+.summary-subvalue {
+  font-size: 0.9rem;
+  color: #6e5a6c;
+}
+
+/* ===== Login overlay ===== */
+.admin-login {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 10000;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.admin-login.is-open {
+  display: flex;
+}
+
+.admin-login__card {
+  width: min(460px, 100%);
+  background: radial-gradient(circle at top left, #ffe5f3 0, #ffffff 55%, #ffe8d8 100%);
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+  padding: 1.4rem 1.3rem 1.2rem;
+  border: 1px solid rgba(245, 207, 228, 0.9);
+}
+
+.admin-login__title {
+  font-family: "Eyesome Script", "Allura", cursive;
+  font-size: 2.4rem;
+  color: var(--pink);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.admin-login__text {
+  text-align: center;
+  color: #6e5a6c;
+  margin-top: 0.35rem;
+}
+
+.admin-login__form {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-login__form input {
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  outline: none;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.admin-login__form input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 2px rgba(215, 68, 153, 0.18);
+}
+
+.admin-login__error {
+  min-height: 1.2em;
+  font-size: 0.9rem;
+  color: #b71c1c;
+  text-align: center;
+}
+
+.summary-value--name {
+  font-size: 1rem;
+  font-weight: 800;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary-subvalue {
+  font-size: 0.9rem;
+  color: #6e5a6c;
+}

@@ -128,6 +128,18 @@ body {
   /* margin-top: 0.2rem; */
 }
 
+.hero-title,
+.hero-subtitle {
+  text-align: center;
+}
+
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centraliza os elementos */
+}
+
+
 
 /* ===== BLOCO DA DATA ===== */
 
@@ -510,4 +522,108 @@ input.invalid {
   input {
     font-size: 0.9rem;
   }
+}
+
+.hidden {
+  display: none !important;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+
+.radio-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+
+/* Grid: PC lado a lado, mobile empilha */
+.img-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 769px) {
+  .img-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.img-poster {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Só no PC vira clicável */
+@media (min-width: 769px) {
+  .img-poster {
+    cursor: zoom-in;
+  }
+}
+
+/* Modal */
+.img-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 9999;
+}
+
+.img-modal.is-open {
+  display: block;
+}
+
+.img-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+}
+
+.img-modal__content {
+  position: absolute;
+  inset: 4vh 6vw;
+  background: rgba(255,255,255,0.96);
+  border-radius: 18px;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.img-modal__title {
+  font-weight: 800;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.img-modal__content img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+}
+
+.img-modal__close {
+  position: sticky;
+  top: 0;
+  float: right;
+  border: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: rgba(215, 68, 153, 0.12);
+  color: var(--pink);
+  font-size: 1.5rem;
+}
+
+/* No mobile: modal desativado (não aparece mesmo que algo chame) */
+@media (max-width: 768px) {
+  .img-modal { display: none !important; }
 }

@@ -1,8 +1,9 @@
 # app/models.py
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from app.database import Base
 
@@ -13,8 +14,16 @@ class Guest(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     phone = Column(String, nullable=False)
-    email = Column(String, nullable=True)
-    confirmed = Column(Boolean, default=False)
+
+    # Substitui "confirmed" por um status mais completo.
+    # YES = vou, NO = não vou, MAYBE = talvez.
+    rsvp_status = Column(String, nullable=False, default="YES")
+
+    # Data/hora em que a pessoa respondeu (ou atualizou a resposta).
+    responded_at = Column(DateTime, nullable=False, server_default=func.now())
+
+    # Campo livre de recado.
+    note = Column(Text, nullable=True)
 
     companions = relationship(
         "Companion",

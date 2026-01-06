@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Presença confirmada – Formatura Duda</title>
+  <title>RSVP – Formatura Duda</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Allura&display=swap" rel="stylesheet">
@@ -14,10 +14,9 @@
 
   <main class="success-main">
     <section class="card success-card">
-      <h1 class="success-title">Presença confirmada!</h1>
-      <p class="success-text">
-        Obrigada por confirmar sua presença! <br>
-        Espero por você!
+      <h1 class="success-title" id="success-title">Resposta registrada!</h1>
+      <p class="success-text" id="success-text">
+        Obrigada por responder. 💜
       </p>
 
       <a href="index.html" class="btn-secondary success-back">
@@ -29,5 +28,33 @@
   <footer class="footer">
     <p>Formatura Duda • Engenharia Computacional</p>
   </footer>
+
+  <script>
+    const status = new URLSearchParams(window.location.search).get('status');
+
+    const titleEl = document.getElementById('success-title');
+    const textEl = document.getElementById('success-text');
+
+    const messages = {
+      YES: {
+        title: 'Presença confirmada! 🎉',
+        text: 'Obrigada por confirmar! Espero por você!'
+      },
+      NO: {
+        title: 'Resposta registrada 💜',
+        text: 'Obrigada por avisar! Vou sentir sua falta...'
+      },
+      MAYBE: {
+        title: 'Resposta registrada ✨',
+        text: 'Obrigada por responder! Se decidir depois, pode responder de novo!'
+      }
+    };
+
+    if (status && messages[status]) {
+      titleEl.textContent = messages[status].title;
+      textEl.textContent = messages[status].text;
+      document.title = `RSVP (${status}) – Formatura Duda`;
+    }
+  </script>
 </body>
 </html>

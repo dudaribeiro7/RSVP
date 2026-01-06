@@ -4,23 +4,66 @@
 const API_BASE_URL = "http://127.0.0.1:8000";
 
 const form = document.getElementById("rsvp-form");
-const addCompanionBtn = document.getElementById("add-companion");
-const companionsContainer = document.getElementById("companions-container");
 const statusMessage = document.getElementById("status-message");
 const submitBtn = document.getElementById("submit-btn");
+
+const companionsSection = document.getElementById("companions-section");
+const addCompanionBtn = document.getElementById("add-companion");
+const companionsContainer = document.getElementById("companions-container");
+
+const rsvpStatusError = document.getElementById("rsvp-status-error");
 
 /* ===========================
    Função de status geral
 =========================== */
 function setStatus(message, type = null) {
   statusMessage.textContent = message || "";
-  statusMessage.classList.remove("status-message--error", "status-message--success");
-  if (type === "error") {
-    statusMessage.classList.add("status-message--error");
-  }
-  if (type === "success") {
+  statusMessage.classList.remove(
+    "status-message--error",
+    "status-message--success"
+  );
+  if (type === "error") statusMessage.classList.add("status-message--error");
+  if (type === "success")
     statusMessage.classList.add("status-message--success");
+}
+
+/* ===========================
+   RSVP Status helpers
+=========================== */
+function getSelectedRsvpStatus() {
+  const el = form.querySelector("input[name='rsvp_status']:checked");
+  return el ? el.value : null; // YES | NO | MAYBE | null
+}
+
+function setRsvpStatusError(message) {
+  if (!rsvpStatusError) return;
+  rsvpStatusError.textContent = message || "";
+  rsvpStatusError.style.display = message ? "block" : "none";
+}
+
+function toggleCompanionsSection() {
+  const status = getSelectedRsvpStatus();
+  const shouldShow = status === "YES";
+
+  if (!companionsSection) return;
+
+  if (shouldShow) {
+    companionsSection.classList.remove("hidden");
+  } else {
+    companionsSection.classList.add("hidden");
+    // Se a pessoa não vai / talvez, limpa acompanhantes
+    if (companionsContainer) companionsContainer.innerHTML = "";
   }
+}
+
+// Observa mudanças no status
+if (form) {
+  form.addEventListener("change", (e) => {
+    if (e.target && e.target.name === "rsvp_status") {
+      setRsvpStatusError("");
+      toggleCompanionsSection();
+    }
+  });
 }
 
 /* ===========================
@@ -35,8 +78,8 @@ function createCompanionRow() {
   input.type = "text";
   input.placeholder = "Nome completo do acompanhante";
   input.className = "companion-input";
-  input.required = true;
   input.autocomplete = "additional-name";
+  input.required = false; // validação é manual
 
   // Mensagem de erro customizada
   const errorSpan = document.createElement("span");
@@ -53,7 +96,6 @@ function createCompanionRow() {
     companionsContainer.removeChild(row);
   });
 
-  // Montagem final
   row.appendChild(input);
   row.appendChild(errorSpan);
   row.appendChild(btnRemove);
@@ -91,25 +133,28 @@ function validateField(input) {
 function validateForm() {
   let valid = true;
 
-  // Valida inputs principais (nome e telefone)
-  const requiredInputs = form.querySelectorAll("input[required]:not(.companion-input)");
+  // Nome e telefone
+  const requiredInputs = form.querySelectorAll(
+    "input[required]:not(.companion-input)"
+  );
   requiredInputs.forEach((input) => {
     if (!validateField(input)) valid = false;
   });
 
-  // Validação dos acompanhantes
-  const companionInputs = companionsContainer.querySelectorAll(".companion-input");
+  // Status RSVP obrigatório
+  const status = getSelectedRsvpStatus();
+  if (!status) {
+    setRsvpStatusError("Selecione uma opção.");
+    valid = false;
+  }
 
-  if (companionInputs.length > 0) {
-    // Se tiver acompanhantes, todos se tornam obrigatórios
+  // Acompanhantes só se status == YES
+  if (status === "YES") {
+    const companionInputs =
+      companionsContainer.querySelectorAll(".companion-input");
     companionInputs.forEach((input) => {
+      // se o campo existe (a pessoa clicou em adicionar), ele vira obrigatório
       if (!validateField(input)) valid = false;
-    });
-  } else {
-    // Sem acompanhantes → ok
-    companionInputs.forEach((input) => {
-      input.classList.remove("invalid");
-      input.nextElementSibling.style.display = "none";
     });
   }
 
@@ -120,35 +165,43 @@ function validateForm() {
    Envio do formulário
 =========================== */
 if (form) {
+  // Estado inicial
+  toggleCompanionsSection();
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     setStatus("");
-    
+
     if (!validateForm()) {
       setStatus("Preencha os campos obrigatórios.", "error");
       return;
     }
-    
-    const name = form.name.value.trim();
-    const phone = form.phone.value.trim();
-    const email = form.email.value.trim();
-    
-    // Coleta dos acompanhantes válidos
+
+    const name = form.elements["name"].value.trim();
+    const phone = form.elements["phone"].value.trim();
+    const note = (form.elements["note"]?.value || "").trim();
+
+    const rsvp_status = getSelectedRsvpStatus(); // YES | NO | MAYBE
+
+    // Coleta acompanhantes (só se YES)
     const companions = [];
-    const companionInputs = companionsContainer.querySelectorAll(".companion-input");
-    companionInputs.forEach((input) => {
-      const value = input.value.trim();
-      if (value) companions.push({ name: value });
-    });
-    
+    if (rsvp_status === "YES") {
+      const companionInputs =
+        companionsContainer.querySelectorAll(".companion-input");
+      companionInputs.forEach((input) => {
+        const value = input.value.trim();
+        if (value) companions.push({ name: value });
+      });
+    }
+
     const payload = {
       name,
       phone,
-      email: email || null,
-      companions
+      rsvp_status,
+      note: note || null,
+      companions,
     };
-    console.log("Payload:", payload);
-    
+
     submitBtn.disabled = true;
     submitBtn.textContent = "Enviando...";
 
@@ -156,30 +209,31 @@ if (form) {
       const response = await fetch(`${API_BASE_URL}/guests/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
-      console.log("Status da resposta:", response.status);
       const text = await response.text();
-      console.log("Corpo da resposta:", text);
-
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        let errorData = {};
+        try {
+          errorData = JSON.parse(text);
+        } catch {}
         console.error("Erro ao enviar RSVP", errorData);
-        throw new Error("Erro ao enviar sua confirmação. Tente novamente em alguns instantes.");
+        throw new Error("Erro ao enviar sua resposta. Tente novamente.");
       }
 
-      setStatus("");
-      console.log("Redirecionando para success.html...");
-      window.location.href = "success.html";
-
+      window.location.href = `success.html?status=${encodeURIComponent(
+        rsvp_status
+      )}`;
     } catch (err) {
       console.error(err);
-      setStatus(err.message || "Não foi possível confirmar agora. Tente mais tarde.", "error");
-
+      setStatus(
+        err.message || "Não foi possível enviar agora. Tente mais tarde.",
+        "error"
+      );
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Confirmar presença";
+      submitBtn.textContent = "Enviar resposta";
     }
   });
 }
@@ -192,22 +246,15 @@ const phoneInput = document.getElementById("phone");
 
 if (phoneInput) {
   phoneInput.addEventListener("input", function (e) {
-    let value = e.target.value.replace(/\D/g, ""); // remove tudo que não é número
+    let value = e.target.value.replace(/\D/g, "");
 
-    // celular 11 dígitos
     if (value.length > 10) {
       value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
-    }
-    // fixo 10 dígitos
-    else if (value.length > 6) {
+    } else if (value.length > 6) {
       value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
-    }
-    // até 6 dígitos
-    else if (value.length > 2) {
+    } else if (value.length > 2) {
       value = value.replace(/^(\d{2})(\d{0,5}).*/, "($1) $2");
-    }
-    // até 2 dígitos
-    else {
+    } else {
       value = value.replace(/^(\d*)/, "($1");
     }
 
@@ -215,3 +262,48 @@ if (phoneInput) {
   });
 }
 
+// ===== Modal Menu & Bar =====
+// ===== Modal só no PC =====
+const isDesktop = () => window.matchMedia("(min-width: 769px)").matches;
+
+const modal = document.getElementById("img-modal");
+const modalImg = document.getElementById("img-modal-img");
+const modalTitle = document.getElementById("img-modal-title");
+
+function openModal(src, title) {
+  if (!isDesktop()) return; // mobile: não faz nada
+  modalImg.src = src;
+  modalImg.alt = title || "Imagem";
+  modalTitle.textContent = title || "";
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+  modalImg.src = "";
+  document.body.style.overflow = "";
+}
+
+// Clique nas imagens (só funciona no PC)
+document.querySelectorAll(".js-open-modal").forEach((img) => {
+  img.addEventListener("click", () => {
+    openModal(img.getAttribute("src"), img.dataset.title);
+  });
+});
+
+// Fechar
+modal?.addEventListener("click", (e) => {
+  if (e.target?.dataset?.close === "1") closeModal();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modal?.classList.contains("is-open")) closeModal();
+});
+
+// Se a pessoa abrir no PC e redimensionar pra mobile, fecha
+window.addEventListener("resize", () => {
+  if (!isDesktop() && modal?.classList.contains("is-open")) closeModal();
+});

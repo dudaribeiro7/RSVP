@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin – RSVP Formatura Duda</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;800&family=Allura&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+  <div class="page-bg-top"></div>
+  <div class="page-bg-bottom"></div>
+
+  <!-- LOGIN OVERLAY -->
+  <div class="admin-login" id="admin-login" aria-hidden="true">
+    <div class="admin-login__card">
+      <h1 class="admin-login__title">Admin</h1>
+      <p class="admin-login__text">Digite seu PIN</p>
+
+      <form id="login-form" class="admin-login__form">
+        <input id="login-token" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="PIN / Token" />
+        <button class="btn-primary" type="submit">Entrar</button>
+        <p class="admin-login__error" id="login-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <header class="admin-hero">
+    <div class="admin-hero__inner">
+      <div class="admin-hero__left">
+        <h1 class="admin-title">Admin RSVP</h1>
+        <p class="admin-subtitle">Formatura Duda • 07/02/2026</p>
+      </div>
+
+      <div class="admin-hero__right">
+        <div class="admin-actions">
+          <button class="btn-secondary" id="btn-refresh" type="button">Atualizar</button>
+          <button class="btn-secondary" id="btn-export" type="button">Exportar CSV</button>
+          <button class="btn-secondary" id="btn-logout" type="button">Sair</button>
+          <a class="btn-secondary" href="index.html">Voltar pro site</a>
+        </div>
+
+        <div class="admin-filters">
+          <div class="admin-search">
+            <input id="search" type="text" placeholder="Buscar por nome, telefone, recado, acompanhante..." autocomplete="off">
+          </div>
+
+          <div class="admin-toggles">
+            <label class="toggle">
+              <input id="toggle-empty-notes" type="checkbox">
+              <span>Ocultar sem recado</span>
+            </label>
+            <label class="toggle">
+              <input id="toggle-no-companions" type="checkbox">
+              <span>Ocultar sem acompanhantes</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="admin-summary" id="summary"></div>
+        <div class="admin-status" id="status"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <section class="admin-card" id="section-yes">
+      <div class="admin-card__header">
+        <h2 class="admin-card__title">
+          Confirmados <span class="pill pill--yes" id="count-yes">0</span>
+        </h2>
+      </div>
+
+      <div class="table-wrap">
+        <table class="admin-table" id="table-yes">
+          <thead>
+            <tr>
+              <th>Convidado</th>
+              <th>Telefone</th>
+              <th>Resposta em</th>
+              <th>Recado</th>
+              <th>Acompanhantes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-card" id="section-no">
+      <div class="admin-card__header">
+        <h2 class="admin-card__title">
+          Não vão <span class="pill pill--no" id="count-no">0</span>
+        </h2>
+      </div>
+
+      <div class="table-wrap">
+        <table class="admin-table" id="table-no">
+          <thead>
+            <tr>
+              <th>Convidado</th>
+              <th>Telefone</th>
+              <th>Resposta em</th>
+              <th>Recado</th>
+              <th>Acompanhantes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-card" id="section-maybe">
+      <div class="admin-card__header">
+        <h2 class="admin-card__title">
+          Talvez <span class="pill pill--maybe" id="count-maybe">0</span>
+        </h2>
+      </div>
+
+      <div class="table-wrap">
+        <table class="admin-table" id="table-maybe">
+          <thead>
+            <tr>
+              <th>Convidado</th>
+              <th>Telefone</th>
+              <th>Resposta em</th>
+              <th>Recado</th>
+              <th>Acompanhantes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="admin-footer">
+      <span>Tip: use “Exportar CSV” pra mandar pro Excel.</span>
+    </footer>
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

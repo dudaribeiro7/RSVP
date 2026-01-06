@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import models, schemas
 
+from app.security import require_admin
+
 router = APIRouter(
     prefix="/companions",
     tags=["Companions"],
@@ -29,7 +31,10 @@ def normalize_name(name: str) -> str:
 #  LIST ALL COMPANIONS
 # ==========================
 @router.get("/", tags=["Companions"])
-def list_companions(db: Session = Depends(get_db)):
+def list_companions(
+    db: Session = Depends(get_db),
+    admin: None = Depends(require_admin)
+):
     comps = db.query(models.Companion).all()
     
     return [
@@ -47,7 +52,11 @@ def list_companions(db: Session = Depends(get_db)):
 #  SEARCH companions by name OR id
 # ==========================
 @router.get("/find")
-def find_companions(q: str, db: Session = Depends(get_db)):
+def find_companions(
+    q: str, 
+    db: Session = Depends(get_db),
+    admin: None = Depends(require_admin)
+):
     possible_id = int(q) if q.isdigit() else None
 
     comps = (
@@ -74,7 +83,12 @@ def find_companions(q: str, db: Session = Depends(get_db)):
 #  ADD companion to a specific guest
 # ==========================
 @router.post("/{guest_id}", status_code=status.HTTP_201_CREATED)
-def add_companion(guest_id: int, companion: schemas.CompanionCreate, db: Session = Depends(get_db)):
+def add_companion(
+    guest_id: int, 
+    companion: schemas.CompanionCreate, 
+    db: Session = Depends(get_db),
+    admin: None = Depends(require_admin)
+):
     guest = db.query(models.Guest).filter(models.Guest.id == guest_id).first()
     if not guest:
         raise HTTPException(status_code=404, detail="Convidado não encontrado.")
@@ -106,7 +120,11 @@ def add_companion(guest_id: int, companion: schemas.CompanionCreate, db: Session
 #  DELETE companion
 # ==========================
 @router.delete("/{companion_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_companion(companion_id: int, db: Session = Depends(get_db)):
+def delete_companion(
+    companion_id: int, 
+    db: Session = Depends(get_db),
+    admin: None = Depends(require_admin)
+):
     comp = (
         db.query(models.Companion)
         .filter(models.Companion.id == companion_id)
