@@ -1,7 +1,6 @@
 // js/rsvp.js
 
-// Troque depois pelo endereço do backend no Render
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://rsvp-api-o8zt.onrender.com";
 
 const form = document.getElementById("rsvp-form");
 const statusMessage = document.getElementById("status-message");
