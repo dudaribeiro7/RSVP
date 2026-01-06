@@ -1,0 +1,6 @@
+.env
+*.db
+rsvp.db
+__pycache__/
+.venv/
+venv/
