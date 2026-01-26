@@ -420,25 +420,32 @@ function switchTab(tabName) {
     }
   });
   
-  // Controlar visibilidade de elementos específicos de guests
+  // Controlar visibilidade de elementos específicos
   const guestsOnlyElements = document.querySelectorAll('.guests-only');
+  const photosOnlyElements = document.querySelectorAll('.photos-only');
   
   if (tabName === 'guests') {
     guestsFilters?.classList.remove('hidden');
     photosFilters?.classList.add('hidden');
     
-    // Mostrar elementos de guests
+    // Mostrar elementos de guests, esconder de photos
     guestsOnlyElements.forEach(el => {
       el.classList.remove('hidden-in-photos');
+    });
+    photosOnlyElements.forEach(el => {
+      el.classList.add('hidden-in-guests');
     });
     
   } else if (tabName === 'photos') {
     guestsFilters?.classList.add('hidden');
     photosFilters?.classList.remove('hidden');
     
-    // Esconder elementos de guests
+    // Esconder elementos de guests, mostrar de photos
     guestsOnlyElements.forEach(el => {
       el.classList.add('hidden-in-photos');
+    });
+    photosOnlyElements.forEach(el => {
+      el.classList.remove('hidden-in-guests');
     });
     
     // Limpar status ao entrar na aba de fotos
@@ -643,4 +650,104 @@ if (els.btnRefresh) {
       await init();
     }
   };
+}
+
+/* ============================= */
+/*  DOWNLOAD DE TODAS AS FOTOS   */
+/* ============================= */
+
+const btnDownloadPhotos = document.getElementById('btn-download-photos');
+
+if (btnDownloadPhotos) {
+  btnDownloadPhotos.addEventListener('click', async () => {
+    if (allPhotos.length === 0) {
+      setStatus('Nenhuma foto para baixar', 'error');
+      return;
+    }
+    
+    try {
+      // Desabilitar botão e mostrar progresso
+      btnDownloadPhotos.disabled = true;
+      btnDownloadPhotos.textContent = 'Preparando download...';
+      setStatus('Baixando fotos...', 'info');
+      
+      const zip = new JSZip();
+      const folder = zip.folder('fotos-festa-duda');
+      
+      // Baixar todas as fotos
+      let downloadedCount = 0;
+      
+      for (const photo of allPhotos) {
+        try {
+          btnDownloadPhotos.textContent = `Baixando ${downloadedCount + 1}/${allPhotos.length}...`;
+          
+          // Fetch da imagem
+          const response = await fetch(photo.photo_url);
+          const blob = await response.blob();
+          
+          // Nome do arquivo
+          const date = new Date(photo.uploaded_at);
+          const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+          const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+          
+          // Extensão da imagem
+          const extension = photo.photo_url.split('.').pop().split('?')[0] || 'jpg';
+          
+          // Nome: data_hora_nome.ext ou data_hora.ext
+          let filename;
+          if (photo.sender_name) {
+            const safeName = photo.sender_name.replace(/[^a-zA-Z0-9]/g, '_');
+            filename = `${dateStr}_${timeStr}_${safeName}.${extension}`;
+          } else {
+            filename = `${dateStr}_${timeStr}.${extension}`;
+          }
+          
+          // Adicionar ao ZIP
+          folder.file(filename, blob);
+          downloadedCount++;
+          
+        } catch (error) {
+          console.error(`Erro ao baixar foto ${photo.id}:`, error);
+        }
+      }
+      
+      if (downloadedCount === 0) {
+        throw new Error('Nenhuma foto foi baixada com sucesso');
+      }
+      
+      // Gerar ZIP
+      setStatus('Gerando arquivo ZIP...', 'info');
+      btnDownloadPhotos.textContent = 'Gerando ZIP...';
+      
+      const zipBlob = await zip.generateAsync({ 
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      });
+      
+      // Download do ZIP
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fotos-festa-duda-${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setStatus(`${downloadedCount} fotos baixadas com sucesso!`, 'success');
+      
+      setTimeout(() => {
+        setStatus('');
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Erro ao baixar fotos:', error);
+      setStatus(`Erro ao baixar fotos: ${error.message}`, 'error');
+    } finally {
+      // Reabilitar botão
+      btnDownloadPhotos.disabled = false;
+      btnDownloadPhotos.textContent = '⬇️ Baixar todas as fotos';
+    }
+  });
 }

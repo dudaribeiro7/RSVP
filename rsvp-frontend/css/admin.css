@@ -633,3 +633,12 @@
 .admin-search {
   width: 100%;
 }
+
+/* Elementos visíveis apenas na aba de fotos */
+.photos-only {
+  display: flex !important;
+}
+
+.photos-only.hidden-in-guests {
+  display: none !important;
+}
