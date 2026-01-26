@@ -364,3 +364,259 @@ if (!getToken()) {
 } else {
   init();
 }
+
+
+/* ============================= */
+/*  TABS & PHOTOS MANAGEMENT     */
+/* ============================= */
+
+let allPhotos = [];
+let currentTab = 'guests';
+let photoToDelete = null;
+
+// Elementos das tabs
+const tabButtons = document.querySelectorAll('.admin-tab');
+const tabContents = document.querySelectorAll('.tab-content');
+const guestsFilters = document.getElementById('guests-filters');
+const photosFilters = document.getElementById('photos-filters');
+const photosGallery = document.getElementById('photos-admin-gallery');
+const photosLoading = document.getElementById('photos-loading');
+const photosEmpty = document.getElementById('photos-empty');
+const photosTotalCount = document.getElementById('photos-total-count');
+const photosSearch = document.getElementById('photos-search');
+
+// Modal de exclusão
+const deleteModal = document.getElementById('delete-modal');
+const deleteModalPreview = document.getElementById('delete-modal-preview');
+const deleteCancel = document.getElementById('delete-cancel');
+const deleteConfirm = document.getElementById('delete-confirm');
+
+// Trocar tabs
+tabButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const tabName = button.dataset.tab;
+    switchTab(tabName);
+  });
+});
+
+function switchTab(tabName) {
+  currentTab = tabName;
+  
+  // Atualizar botões
+  tabButtons.forEach(btn => {
+    if (btn.dataset.tab === tabName) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  // Atualizar conteúdos
+  tabContents.forEach(content => {
+    if (content.id === `tab-${tabName}`) {
+      content.classList.remove('hidden');
+    } else {
+      content.classList.add('hidden');
+    }
+  });
+  
+  // Controlar visibilidade de elementos específicos de guests
+  const guestsOnlyElements = document.querySelectorAll('.guests-only');
+  
+  if (tabName === 'guests') {
+    guestsFilters?.classList.remove('hidden');
+    photosFilters?.classList.add('hidden');
+    
+    // Mostrar elementos de guests
+    guestsOnlyElements.forEach(el => {
+      el.classList.remove('hidden-in-photos');
+    });
+    
+  } else if (tabName === 'photos') {
+    guestsFilters?.classList.add('hidden');
+    photosFilters?.classList.remove('hidden');
+    
+    // Esconder elementos de guests
+    guestsOnlyElements.forEach(el => {
+      el.classList.add('hidden-in-photos');
+    });
+    
+    // Limpar status ao entrar na aba de fotos
+    setStatus('');
+    
+    loadPhotos();
+  }
+}
+
+// Carregar fotos
+async function loadPhotos() {
+  if (!photosGallery) return;
+  
+  try {
+    photosLoading?.classList.remove('hidden');
+    photosEmpty?.classList.add('hidden');
+    photosGallery.innerHTML = '';
+    
+    const response = await fetch(`${API_BASE_URL}/photos/`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    
+    if (!response.ok) throw new Error('Erro ao carregar fotos');
+    
+    allPhotos = await response.json();
+    
+    // Atualizar contador
+    if (photosTotalCount) {
+      photosTotalCount.textContent = allPhotos.length;
+    }
+    
+    // Renderizar galeria
+    if (allPhotos.length === 0) {
+      photosEmpty?.classList.remove('hidden');
+    } else {
+      renderPhotosGallery(allPhotos);
+    }
+    
+  } catch (error) {
+    console.error('Erro ao carregar fotos:', error);
+    setStatus('Erro ao carregar fotos', 'error');
+  } finally {
+    photosLoading?.classList.add('hidden');
+  }
+}
+
+// Renderizar galeria de fotos
+function renderPhotosGallery(photos) {
+  if (!photosGallery) return;
+  
+  photosGallery.innerHTML = photos.map(photo => {
+    const date = new Date(photo.uploaded_at);
+    const dateStr = date.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+    
+    return `
+      <div class="photo-admin-item" data-photo-id="${photo.id}">
+        <img 
+          src="${escapeHtml(photo.photo_url)}" 
+          alt="Foto" 
+          class="photo-admin-img"
+          loading="lazy"
+        />
+        <div class="photo-admin-overlay">
+          ${photo.sender_name ? `
+            <div class="photo-admin-sender">${escapeHtml(photo.sender_name)}</div>
+          ` : ''}
+          <div class="photo-admin-date">${dateStr}</div>
+        </div>
+        <div class="photo-admin-actions">
+          <button 
+            class="photo-admin-btn photo-admin-btn--delete" 
+            data-photo-id="${photo.id}"
+            data-photo-url="${escapeHtml(photo.photo_url)}"
+            title="Excluir foto"
+          >
+            🗑️
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Adicionar event listeners para botões de deletar
+  photosGallery.querySelectorAll('.photo-admin-btn--delete').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const photoId = parseInt(btn.dataset.photoId);
+      const photoUrl = btn.dataset.photoUrl;
+      openDeleteModal(photoId, photoUrl);
+    });
+  });
+}
+
+// Buscar fotos
+if (photosSearch) {
+  photosSearch.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    
+    if (!query) {
+      renderPhotosGallery(allPhotos);
+      return;
+    }
+    
+    const filtered = allPhotos.filter(photo => {
+      return photo.sender_name && photo.sender_name.toLowerCase().includes(query);
+    });
+    
+    renderPhotosGallery(filtered);
+  });
+}
+
+// Modal de exclusão
+function openDeleteModal(photoId, photoUrl) {
+  photoToDelete = photoId;
+  if (deleteModalPreview) {
+    deleteModalPreview.src = photoUrl;
+  }
+  deleteModal?.classList.add('is-open');
+}
+
+function closeDeleteModal() {
+  photoToDelete = null;
+  if (deleteModalPreview) {
+    deleteModalPreview.src = '';
+  }
+  deleteModal?.classList.remove('is-open');
+}
+
+if (deleteCancel) {
+  deleteCancel.addEventListener('click', closeDeleteModal);
+}
+
+if (deleteModal) {
+  deleteModal.querySelector('.delete-modal__backdrop')?.addEventListener('click', closeDeleteModal);
+}
+
+if (deleteConfirm) {
+  deleteConfirm.addEventListener('click', async () => {
+    if (!photoToDelete) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/photos/${photoToDelete}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      });
+      
+      if (!response.ok) throw new Error('Erro ao excluir foto');
+      
+      setStatus('Foto excluída com sucesso', 'success');
+      closeDeleteModal();
+      
+      // Recarregar galeria
+      setTimeout(() => {
+        loadPhotos();
+      }, 500);
+      
+    } catch (error) {
+      console.error('Erro ao excluir foto:', error);
+      setStatus('Erro ao excluir foto', 'error');
+    }
+  });
+}
+
+// Atualizar botão de refresh para recarregar fotos também
+const originalRefresh = els.btnRefresh?.onclick;
+if (els.btnRefresh) {
+  els.btnRefresh.onclick = async () => {
+    if (currentTab === 'photos') {
+      await loadPhotos();
+    } else if (originalRefresh) {
+      await originalRefresh();
+    } else {
+      await init();
+    }
+  };
+}

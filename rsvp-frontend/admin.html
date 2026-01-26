@@ -39,107 +39,155 @@
       </div>
 
       <div class="admin-hero__right">
+        <!-- TABS - MOVIDAS PARA CIMA -->
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="guests">
+            <span class="admin-tab__icon">👥</span>
+            <span class="admin-tab__label">Convidados</span>
+          </button>
+          <button class="admin-tab" data-tab="photos">
+            <span class="admin-tab__icon">📸</span>
+            <span class="admin-tab__label">Fotos</span>
+          </button>
+        </div>
+
         <div class="admin-actions">
           <button class="btn-secondary" id="btn-refresh" type="button">Atualizar</button>
-          <button class="btn-secondary" id="btn-export-docx" type="button">Exportar DOCX</button>
-          <button class="btn-secondary" id="btn-export-pdf" type="button">Exportar PDF</button>
+          <button class="btn-secondary guests-only" id="btn-export-docx" type="button">Exportar DOCX</button>
+          <button class="btn-secondary guests-only" id="btn-export-pdf" type="button">Exportar PDF</button>
           <button class="btn-secondary" id="btn-logout" type="button">Sair</button>
           <a class="btn-secondary" href="index.html">Voltar pro site</a>
         </div>
 
-        <div class="admin-filters">
+        <!-- Filtros de Convidados -->
+        <div class="admin-filters guests-only" id="guests-filters">
           <div class="admin-search">
             <input id="search" type="text" placeholder="Buscar por nome, telefone, recado, acompanhante..." autocomplete="off">
           </div>
+        </div>
 
-          <div class="admin-toggles">
-            <label class="toggle">
-              <input id="toggle-empty-notes" type="checkbox">
-              <span>Ocultar sem recado</span>
-            </label>
-            <label class="toggle">
-              <input id="toggle-no-companions" type="checkbox">
-              <span>Ocultar sem acompanhantes</span>
-            </label>
+        <!-- Filtros de Fotos -->
+        <div class="admin-filters hidden" id="photos-filters">
+          <div class="admin-search">
+            <input id="photos-search" type="text" placeholder="Buscar por nome..." autocomplete="off">
           </div>
         </div>
 
-        <div class="admin-summary" id="summary"></div>
+        <div class="admin-summary guests-only" id="summary"></div>
         <div class="admin-status" id="status"></div>
       </div>
     </div>
   </header>
 
   <main class="admin-main">
-    <section class="admin-card" id="section-yes">
-      <div class="admin-card__header">
-        <h2 class="admin-card__title">
-          Confirmados <span class="pill pill--yes" id="count-yes">0</span>
-        </h2>
-      </div>
+    <!-- TAB: Convidados -->
+    <div class="tab-content active" id="tab-guests">
+      <section class="admin-card" id="section-yes">
+        <div class="admin-card__header">
+          <h2 class="admin-card__title">
+            Confirmados <span class="pill pill--yes" id="count-yes">0</span>
+          </h2>
+        </div>
 
-      <div class="table-wrap">
-        <table class="admin-table" id="table-yes">
-          <thead>
-            <tr>
-              <th>Convidado</th>
-              <th>Telefone</th>
-              <th>Resposta em</th>
-              <th>Recado</th>
-              <th>Acompanhantes</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
+        <div class="table-wrap">
+          <table class="admin-table" id="table-yes">
+            <thead>
+              <tr>
+                <th>Convidado</th>
+                <th>Telefone</th>
+                <th>Resposta em</th>
+                <th>Recado</th>
+                <th>Acompanhantes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
 
-    <section class="admin-card" id="section-no">
-      <div class="admin-card__header">
-        <h2 class="admin-card__title">
-          Não vão <span class="pill pill--no" id="count-no">0</span>
-        </h2>
-      </div>
+      <section class="admin-card" id="section-no">
+        <div class="admin-card__header">
+          <h2 class="admin-card__title">
+            Não vão <span class="pill pill--no" id="count-no">0</span>
+          </h2>
+        </div>
 
-      <div class="table-wrap">
-        <table class="admin-table" id="table-no">
-          <thead>
-            <tr>
-              <th>Convidado</th>
-              <th>Telefone</th>
-              <th>Resposta em</th>
-              <th>Recado</th>
-              <th>Acompanhantes</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
+        <div class="table-wrap">
+          <table class="admin-table" id="table-no">
+            <thead>
+              <tr>
+                <th>Convidado</th>
+                <th>Telefone</th>
+                <th>Resposta em</th>
+                <th>Recado</th>
+                <th>Acompanhantes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
 
-    <section class="admin-card" id="section-maybe">
-      <div class="admin-card__header">
-        <h2 class="admin-card__title">
-          Talvez <span class="pill pill--maybe" id="count-maybe">0</span>
-        </h2>
-      </div>
+      <section class="admin-card" id="section-maybe">
+        <div class="admin-card__header">
+          <h2 class="admin-card__title">
+            Talvez <span class="pill pill--maybe" id="count-maybe">0</span>
+          </h2>
+        </div>
 
-      <div class="table-wrap">
-        <table class="admin-table" id="table-maybe">
-          <thead>
-            <tr>
-              <th>Convidado</th>
-              <th>Telefone</th>
-              <th>Resposta em</th>
-              <th>Recado</th>
-              <th>Acompanhantes</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
+        <div class="table-wrap">
+          <table class="admin-table" id="table-maybe">
+            <thead>
+              <tr>
+                <th>Convidado</th>
+                <th>Telefone</th>
+                <th>Resposta em</th>
+                <th>Recado</th>
+                <th>Acompanhantes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- TAB: Fotos -->
+    <div class="tab-content hidden" id="tab-photos">
+      <section class="admin-card">
+        <div class="admin-card__header">
+          <h2 class="admin-card__title">
+            Galeria <span class="pill" id="photos-total-count">0</span>
+          </h2>
+        </div>
+
+        <div id="photos-loading" class="photos-admin-loading hidden">
+          <div class="loading-spinner"></div>
+          <span>Carregando fotos...</span>
+        </div>
+
+        <div id="photos-empty" class="photos-admin-empty hidden">
+          Nenhuma foto enviada ainda.
+        </div>
+
+        <div id="photos-admin-gallery" class="photos-admin-gallery"></div>
+      </section>
+    </div>
   </main>
+
+  <!-- Modal de confirmação de exclusão -->
+  <div class="delete-modal" id="delete-modal">
+    <div class="delete-modal__backdrop"></div>
+    <div class="delete-modal__card">
+      <h3 class="delete-modal__title">Excluir foto?</h3>
+      <img id="delete-modal-preview" class="delete-modal__preview" alt="Preview">
+      <p class="delete-modal__text">Esta ação não pode ser desfeita.</p>
+      <div class="delete-modal__actions">
+        <button class="btn-secondary" id="delete-cancel">Cancelar</button>
+        <button class="btn-primary" id="delete-confirm" style="background: #b71c1c;">Excluir</button>
+      </div>
+    </div>
+  </div>
 
   <script src="js/admin.js"></script>
 </body>
