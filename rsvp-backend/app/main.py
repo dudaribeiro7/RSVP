@@ -3,9 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine
-from app.routers import guests, companions, photos
-
-# from app import models
+from app.routers import guests, companions, photos, tables
 
 Base.metadata.create_all(bind=engine)
 
@@ -32,3 +30,4 @@ def root():
 app.include_router(guests.router)
 app.include_router(companions.router)
 app.include_router(photos.router)
+app.include_router(tables.router)

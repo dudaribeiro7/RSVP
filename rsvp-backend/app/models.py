@@ -54,3 +54,18 @@ class Photo(Base):
     cloudinary_public_id = Column(String, nullable=False)
     
     uploaded_at = Column(DateTime, nullable=False, server_default=func.now())
+
+
+class TableArrangement(Base):
+    __tablename__ = "table_arrangements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    table_number = Column(Integer, nullable=False)
+    
+    # Pode ser um guest_id ou companion_id
+    guest_id = Column(Integer, ForeignKey("guests.id", ondelete="CASCADE"), nullable=True)
+    companion_id = Column(Integer, ForeignKey("companions.id", ondelete="CASCADE"), nullable=True)
+    
+    # Relacionamentos
+    guest = relationship("Guest")
+    companion = relationship("Companion")

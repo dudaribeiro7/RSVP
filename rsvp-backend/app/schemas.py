@@ -88,3 +88,30 @@ class PhotoResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class TableAssignment(BaseModel):
+    guest_id: Optional[int] = None
+    companion_id: Optional[int] = None
+
+
+class TableCreate(BaseModel):
+    table_number: int
+    assignments: List[TableAssignment]
+
+
+class TableResponse(BaseModel):
+    id: int
+    table_number: int
+    guest_id: Optional[int]
+    companion_id: Optional[int]
+
+    class Config:
+        from_attributes = True
+
+
+class PersonInfo(BaseModel):
+    id: str  # Formato: "guest_123" ou "companion_456"
+    name: str
+    type: str  # "guest" ou "companion"
+    guest_name: Optional[str] = None  # Nome do convidado principal (para acompanhantes)

@@ -423,35 +423,72 @@ function switchTab(tabName) {
   // Controlar visibilidade de elementos específicos
   const guestsOnlyElements = document.querySelectorAll('.guests-only');
   const photosOnlyElements = document.querySelectorAll('.photos-only');
+  const tablesOnlyElements = document.querySelectorAll('.tables-only');
   
   if (tabName === 'guests') {
     guestsFilters?.classList.remove('hidden');
     photosFilters?.classList.add('hidden');
+    tablesFilters?.classList.add('hidden');
     
-    // Mostrar elementos de guests, esconder de photos
+    // Mostrar elementos de guests
     guestsOnlyElements.forEach(el => {
       el.classList.remove('hidden-in-photos');
+      el.classList.remove('hidden-in-tables');
     });
     photosOnlyElements.forEach(el => {
+      el.classList.add('hidden-in-guests');
+    });
+    tablesOnlyElements.forEach(el => {
       el.classList.add('hidden-in-guests');
     });
     
   } else if (tabName === 'photos') {
     guestsFilters?.classList.add('hidden');
     photosFilters?.classList.remove('hidden');
+    tablesFilters?.classList.add('hidden');
     
-    // Esconder elementos de guests, mostrar de photos
+    // Mostrar elementos de photos
     guestsOnlyElements.forEach(el => {
       el.classList.add('hidden-in-photos');
     });
     photosOnlyElements.forEach(el => {
       el.classList.remove('hidden-in-guests');
     });
+    tablesOnlyElements.forEach(el => {
+      el.classList.add('hidden-in-photos');
+    });
     
     // Limpar status ao entrar na aba de fotos
     setStatus('');
     
     loadPhotos();
+    
+  } else if (tabName === 'tables') {
+    guestsFilters?.classList.add('hidden');
+    photosFilters?.classList.add('hidden');
+    tablesFilters?.classList.remove('hidden');
+    
+    // Mostrar elementos de tables
+    guestsOnlyElements.forEach(el => {
+      el.classList.add('hidden-in-tables');
+    });
+    photosOnlyElements.forEach(el => {
+      el.classList.add('hidden-in-photos');
+    });
+    tablesOnlyElements.forEach(el => {
+      el.classList.remove('hidden-in-guests');
+      el.classList.remove('hidden-in-photos');
+    });
+    
+    // Limpar status
+    setStatus('');
+    
+    // Carregar dados de mesas
+    if (allPeople.length === 0) {
+      loadPeople().then(() => loadTablesArrangement());
+    } else {
+      loadTablesArrangement();
+    }
   }
 }
 
@@ -748,6 +785,305 @@ if (btnDownloadPhotos) {
       // Reabilitar botão
       btnDownloadPhotos.disabled = false;
       btnDownloadPhotos.textContent = '⬇️ Baixar todas as fotos';
+    }
+  });
+}
+
+/* ============================= */
+/*  ORGANIZAÇÃO DE MESAS         */
+/* ============================= */
+
+let allPeople = [];
+let tablesData = {};
+let assignedPeople = new Set();
+
+// Elementos
+const tablesFilters = document.getElementById('tables-filters');
+const tablesContainer = document.getElementById('tables-container');
+const numTablesInput = document.getElementById('num-tables');
+const btnGenerateTables = document.getElementById('btn-generate-tables');
+const btnSaveTables = document.getElementById('btn-save-tables');
+const btnClearTables = document.getElementById('btn-clear-tables');
+
+// Carregar pessoas disponíveis
+async function loadPeople() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/tables/people`, {
+      headers: authedHeaders()
+    });
+    
+    if (response.status === 401) {
+      clearToken();
+      openLogin("PIN inválido.");
+      throw new Error("Não autorizado");
+    }
+    
+    if (!response.ok) throw new Error('Erro ao carregar pessoas');
+    
+    allPeople = await response.json();
+    
+  } catch (error) {
+    console.error('Erro ao carregar pessoas:', error);
+    setStatus('Erro ao carregar lista de convidados', 'error');
+  }
+}
+
+// Carregar arranjo de mesas salvo
+async function loadTablesArrangement() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/tables/arrangements`, {
+      headers: authedHeaders()
+    });
+    
+    if (response.status === 401) {
+      clearToken();
+      openLogin("PIN inválido.");
+      throw new Error("Não autorizado");
+    }
+    
+    if (!response.ok) throw new Error('Erro ao carregar arranjo de mesas');
+    
+    const savedTables = await response.json();
+    
+    // Se tem mesas salvas, gerar interface com elas
+    if (Object.keys(savedTables).length > 0) {
+      const maxTable = Math.max(...Object.keys(savedTables).map(Number));
+      numTablesInput.value = maxTable;
+      tablesData = savedTables;
+      renderTables();
+    }
+    
+  } catch (error) {
+    console.error('Erro ao carregar arranjo:', error);
+  }
+}
+
+// Gerar mesas
+if (btnGenerateTables) {
+  btnGenerateTables.addEventListener('click', () => {
+    const numTables = parseInt(numTablesInput.value) || 10;
+    
+    if (numTables < 1 || numTables > 50) {
+      setStatus('Número de mesas deve estar entre 1 e 50', 'error');
+      return;
+    }
+    
+    // Manter dados das mesas existentes se possível
+    const newTablesData = {};
+    for (let i = 1; i <= numTables; i++) {
+      newTablesData[i] = tablesData[i] || [];
+    }
+    
+    tablesData = newTablesData;
+    renderTables();
+    setStatus('');
+  });
+}
+
+// Renderizar mesas
+function renderTables() {
+  if (!tablesContainer) return;
+  
+  const tableNumbers = Object.keys(tablesData).sort((a, b) => Number(a) - Number(b));
+  
+  if (tableNumbers.length === 0) {
+    tablesContainer.innerHTML = '<p class="tables-empty">Defina o número de mesas acima e clique em "Gerar mesas"</p>';
+    return;
+  }
+  
+  // Recalcular pessoas já atribuídas
+  assignedPeople.clear();
+  for (const people of Object.values(tablesData)) {
+    people.forEach(personId => {
+      if (personId) assignedPeople.add(personId);
+    });
+  }
+  
+  tablesContainer.innerHTML = tableNumbers.map(tableNum => {
+    const people = tablesData[tableNum] || [];
+    const occupiedSeats = people.filter(p => p).length;
+    
+    return `
+      <div class="table-card" data-table="${tableNum}">
+        <div class="table-card__header">
+          <h3 class="table-card__title">Mesa ${tableNum}</h3>
+          <span class="table-card__count">${occupiedSeats}/8 lugares</span>
+        </div>
+        <div class="table-card__seats">
+          ${[1, 2, 3, 4, 5, 6, 7, 8].map(seatNum => `
+            <div class="table-seat">
+              <div class="table-seat__number">${seatNum}</div>
+              <select 
+                class="table-seat__select" 
+                data-table="${tableNum}" 
+                data-seat="${seatNum - 1}"
+              >
+                <option value="">-- Vazio --</option>
+                ${renderPeopleOptions(people[seatNum - 1])}
+              </select>
+              ${people[seatNum - 1] ? `
+                <button 
+                  class="table-seat__remove" 
+                  data-table="${tableNum}" 
+                  data-seat="${seatNum - 1}"
+                  title="Remover pessoa"
+                >
+                  ×
+                </button>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Adicionar event listeners
+  tablesContainer.querySelectorAll('.table-seat__select').forEach(select => {
+    select.addEventListener('change', handleSeatChange);
+  });
+  
+  tablesContainer.querySelectorAll('.table-seat__remove').forEach(btn => {
+    btn.addEventListener('click', handleRemovePerson);
+  });
+}
+
+// Renderizar opções de pessoas no dropdown
+function renderPeopleOptions(currentPersonId) {
+  return allPeople.map(person => {
+    const isAssigned = assignedPeople.has(person.id) && person.id !== currentPersonId;
+    const isSelected = person.id === currentPersonId;
+    
+    return `
+      <option 
+        value="${person.id}" 
+        ${isSelected ? 'selected' : ''}
+        ${isAssigned ? 'disabled' : ''}
+        data-type="${person.type}"
+      >
+        ${person.name}${isAssigned ? ' (já alocado)' : ''}
+      </option>
+    `;
+  }).join('');
+}
+
+// Tratar mudança de assento
+function handleSeatChange(e) {
+  const select = e.target;
+  const tableNum = select.dataset.table;
+  const seatIndex = parseInt(select.dataset.seat);
+  const personId = select.value;
+  
+  // Remover pessoa antiga do set de atribuídas
+  const oldPersonId = tablesData[tableNum][seatIndex];
+  if (oldPersonId) {
+    assignedPeople.delete(oldPersonId);
+  }
+  
+  // Atualizar dados
+  tablesData[tableNum][seatIndex] = personId || null;
+  
+  // Adicionar nova pessoa ao set
+  if (personId) {
+    assignedPeople.add(personId);
+  }
+  
+  // Re-renderizar
+  renderTables();
+}
+
+// Remover pessoa de um assento
+function handleRemovePerson(e) {
+  const btn = e.target;
+  const tableNum = btn.dataset.table;
+  const seatIndex = parseInt(btn.dataset.seat);
+  
+  const personId = tablesData[tableNum][seatIndex];
+  if (personId) {
+    assignedPeople.delete(personId);
+  }
+  
+  tablesData[tableNum][seatIndex] = null;
+  renderTables();
+}
+
+// Salvar mesas
+if (btnSaveTables) {
+  btnSaveTables.addEventListener('click', async () => {
+    try {
+      btnSaveTables.disabled = true;
+      btnSaveTables.textContent = 'Salvando...';
+      
+      const response = await fetch(`${API_BASE_URL}/tables/arrangements`, {
+        method: 'POST',
+        headers: {
+          ...authedHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tablesData)
+      });
+      
+      if (response.status === 401) {
+        clearToken();
+        openLogin("PIN inválido.");
+        throw new Error("Não autorizado");
+      }
+      
+      if (!response.ok) throw new Error('Erro ao salvar mesas');
+      
+      setStatus('Mesas salvas com sucesso!', 'success');
+      
+      setTimeout(() => setStatus(''), 2000);
+      
+    } catch (error) {
+      console.error('Erro ao salvar mesas:', error);
+      setStatus('Erro ao salvar mesas', 'error');
+    } finally {
+      btnSaveTables.disabled = false;
+      btnSaveTables.textContent = '💾 Salvar mesas';
+    }
+  });
+}
+
+// Limpar todas as mesas
+if (btnClearTables) {
+  btnClearTables.addEventListener('click', async () => {
+    if (!confirm('Tem certeza que deseja limpar TODA a organização de mesas? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+    
+    try {
+      btnClearTables.disabled = true;
+      
+      const response = await fetch(`${API_BASE_URL}/tables/arrangements`, {
+        method: 'DELETE',
+        headers: authedHeaders()
+      });
+      
+      if (response.status === 401) {
+        clearToken();
+        openLogin("PIN inválido.");
+        throw new Error("Não autorizado");
+      }
+      
+      if (!response.ok) throw new Error('Erro ao limpar mesas');
+      
+      // Limpar dados locais
+      for (const tableNum in tablesData) {
+        tablesData[tableNum] = [];
+      }
+      assignedPeople.clear();
+      
+      renderTables();
+      setStatus('Mesas limpas com sucesso', 'success');
+      
+      setTimeout(() => setStatus(''), 2000);
+      
+    } catch (error) {
+      console.error('Erro ao limpar mesas:', error);
+      setStatus('Erro ao limpar mesas', 'error');
+    } finally {
+      btnClearTables.disabled = false;
     }
   });
 }
