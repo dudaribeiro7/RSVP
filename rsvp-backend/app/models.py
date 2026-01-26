@@ -40,3 +40,17 @@ class Companion(Base):
 
     guest_id = Column(Integer, ForeignKey("guests.id", ondelete="CASCADE"))
     guest = relationship("Guest", back_populates="companions")
+
+
+class Photo(Base):
+    __tablename__ = "photos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    
+    sender_name = Column(String, nullable=True)
+    
+    photo_url = Column(String, nullable=False)
+    
+    cloudinary_public_id = Column(String, nullable=False)
+    
+    uploaded_at = Column(DateTime, nullable=False, server_default=func.now())

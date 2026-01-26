@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Formatura Duda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Allura&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/photos.css" />
+  </head>
+  <body>
+    <div class="page-bg-top"></div>
+    <div class="page-bg-bottom"></div>
+
+    <header class="hero">
+      <div class="hero-left">
+        <img
+          src="img/logo-formatura.png"
+          alt="Formatura Duda"
+          class="hero-logo"
+        />
+      </div>
+      <div class="hero-right">
+        <h1 class="hero-title">Formatura Duda</h1>
+        <p class="hero-subtitle">Engenharia Computacional</p>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- NOVA SEÇÃO: Compartilhe suas fotos -->
+      <section class="card" id="photos-section">
+        <h2 class="card-title">📸 Compartilhe suas fotos</h2>
+        <p class="card-text">
+          Capture os melhores momentos da festa e envie suas fotos aqui!<br>
+          <small style="color: #7a6276;">Você pode enviar até 30 fotos por vez</small>
+        </p>
+
+        <!-- Upload de foto -->
+        <div class="photo-upload-section">
+          <form id="photo-upload-form" class="photo-upload-form">
+            <div class="form-group">
+              <label for="photo-sender-name">Seu nome (opcional)</label>
+              <input
+                id="photo-sender-name"
+                name="photo-sender-name"
+                type="text"
+                placeholder="Ex: Maria Eduarda"
+              />
+            </div>
+
+            <div class="photo-file-input-wrapper">
+              <input
+                type="file"
+                id="photo-file"
+                accept="image/*"
+                capture="environment"
+                multiple
+                required
+              />
+              <label for="photo-file" class="photo-file-label">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span>Clique para selecionar fotos</span>
+              </label>
+              <div class="selected-photos-count" id="selected-photos-count"></div>
+            </div>
+
+            <!-- Preview das fotos -->
+            <div id="photo-preview-container" class="photo-preview-container hidden">
+              <div id="photo-preview-grid" class="photo-preview-grid"></div>
+            </div>
+
+            <div class="form-footer">
+              <button type="submit" class="btn-primary" id="photo-submit-btn">
+                Enviar fotos
+              </button>
+              <p class="status-message" id="photo-status-message"></p>
+            </div>
+          </form>
+        </div>
+
+        <!-- Galeria de fotos -->
+        <div class="photos-header">
+          <h3 style="font-size: 1.1rem; margin: 0">Galeria da festa</h3>
+          <span class="photos-count">
+            <span id="photos-count">0</span> fotos
+          </span>
+        </div>
+
+        <div id="photos-loading" class="photos-loading hidden">
+          <div class="loading-spinner"></div>
+          <span>Carregando fotos...</span>
+        </div>
+
+        <div id="photos-empty" class="photos-empty hidden">
+          Nenhuma foto enviada ainda. Seja o primeiro! 📷
+        </div>
+
+        <div id="photos-gallery" class="photos-gallery"></div>
+      </section>
+
+      <!-- Modal (só vai ser usado no PC) -->
+      <div class="img-modal" id="img-modal" aria-hidden="true">
+        <div class="img-modal__backdrop" data-close="1"></div>
+
+        <div class="img-modal__content" role="dialog" aria-modal="true">
+          <button class="img-modal__close" type="button" data-close="1">
+            ×
+          </button>
+          <div class="img-modal__title" id="img-modal-title"></div>
+          <img id="img-modal-img" alt="" />
+        </div>
+      </div>
+
+      <!-- Modal de foto -->
+      <div class="photo-modal" id="photo-modal" aria-hidden="true">
+        <div class="photo-modal__backdrop" data-close="1"></div>
+        <div class="photo-modal__content">
+          <button class="photo-modal__close" type="button" data-close="1">
+            ×
+          </button>
+          <img id="photo-modal-img" alt="" />
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>Formatura Duda • Engenharia Computacional</p>
+    </footer>
+
+    <script src="js/photos.js"></script>
+  </body>
+</html>

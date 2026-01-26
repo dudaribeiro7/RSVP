@@ -3,6 +3,8 @@ uvicorn[standard]
 sqlalchemy
 psycopg2-binary
 python-dotenv
+python-multipart
 email-validator
 python-docx
 reportlab
+cloudinary

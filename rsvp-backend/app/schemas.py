@@ -74,3 +74,17 @@ class GuestUpdate(BaseModel):
     # Novo: permite alterar o status/recado (caso você use no admin futuramente)
     rsvp_status: Optional[RSVPStatus] = None
     note: Optional[str] = None
+
+class PhotoUpload(BaseModel):
+    sender_name: Optional[str] = None
+
+
+class PhotoResponse(BaseModel):
+    id: int
+    sender_name: Optional[str]
+    photo_url: str
+    cloudinary_public_id: str
+    uploaded_at: datetime
+
+    class Config:
+        from_attributes = True
