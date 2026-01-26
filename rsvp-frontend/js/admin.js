@@ -457,9 +457,7 @@ async function loadPhotos() {
     photosEmpty?.classList.add('hidden');
     photosGallery.innerHTML = '';
     
-    const response = await fetch(`${API_BASE_URL}/photos/`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    });
+    const response = await fetch(`${API_BASE_URL}/photos/`);
     
     if (!response.ok) throw new Error('Erro ao carregar fotos');
     
@@ -584,13 +582,37 @@ if (deleteConfirm) {
   deleteConfirm.addEventListener('click', async () => {
     if (!photoToDelete) return;
     
+    const token = getToken();
+    if (!token) {
+      setStatus('Erro: Token de autenticação não encontrado', 'error');
+      return;
+    }
+    
     try {
+      console.log('Deletando foto ID:', photoToDelete);
+      console.log('URL:', `${API_BASE_URL}/photos/${photoToDelete}`);
+      
       const response = await fetch(`${API_BASE_URL}/photos/${photoToDelete}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${getToken()}` }
+        headers: {
+          'Accept': 'application/json',
+          'X-Admin-Token': token
+        }
       });
       
-      if (!response.ok) throw new Error('Erro ao excluir foto');
+      console.log('Response status:', response.status);
+      
+      if (response.status === 401) {
+        clearToken();
+        openLogin("PIN inválido.");
+        throw new Error("Não autorizado");
+      }
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Erro do servidor:', errorData);
+        throw new Error(`Erro ${response.status}: ${errorData}`);
+      }
       
       setStatus('Foto excluída com sucesso', 'success');
       closeDeleteModal();
@@ -598,11 +620,13 @@ if (deleteConfirm) {
       // Recarregar galeria
       setTimeout(() => {
         loadPhotos();
-      }, 500);
+        setStatus('');
+      }, 1500);
       
     } catch (error) {
-      console.error('Erro ao excluir foto:', error);
-      setStatus('Erro ao excluir foto', 'error');
+      console.error('Erro completo:', error);
+      setStatus(`Erro ao excluir foto: ${error.message}`, 'error');
+      closeDeleteModal();
     }
   });
 }
