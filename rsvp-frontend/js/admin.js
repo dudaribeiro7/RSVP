@@ -402,7 +402,7 @@ tabButtons.forEach(button => {
 function switchTab(tabName) {
   currentTab = tabName;
   
-  // Atualizar botões
+  // Atualizar botões das tabs
   tabButtons.forEach(btn => {
     if (btn.dataset.tab === tabName) {
       btn.classList.add('active');
@@ -411,7 +411,7 @@ function switchTab(tabName) {
     }
   });
   
-  // Atualizar conteúdos
+  // Atualizar conteúdos das tabs
   tabContents.forEach(content => {
     if (content.id === `tab-${tabName}`) {
       content.classList.remove('hidden');
@@ -420,21 +420,29 @@ function switchTab(tabName) {
     }
   });
   
-  // Controlar visibilidade de elementos específicos
+  // Pegar todos os elementos de controle
   const guestsOnlyElements = document.querySelectorAll('.guests-only');
   const photosOnlyElements = document.querySelectorAll('.photos-only');
   const tablesOnlyElements = document.querySelectorAll('.tables-only');
   
+  // Resetar todas as classes de visibilidade primeiro
+  guestsOnlyElements.forEach(el => {
+    el.classList.remove('hidden-in-photos', 'hidden-in-tables');
+  });
+  photosOnlyElements.forEach(el => {
+    el.classList.remove('hidden-in-guests', 'hidden-in-tables');
+  });
+  tablesOnlyElements.forEach(el => {
+    el.classList.remove('hidden-in-guests', 'hidden-in-photos');
+  });
+  
+  // Aplicar classes específicas para cada aba
   if (tabName === 'guests') {
     guestsFilters?.classList.remove('hidden');
     photosFilters?.classList.add('hidden');
     tablesFilters?.classList.add('hidden');
     
-    // Mostrar elementos de guests
-    guestsOnlyElements.forEach(el => {
-      el.classList.remove('hidden-in-photos');
-      el.classList.remove('hidden-in-tables');
-    });
+    // Esconder elementos de outras abas
     photosOnlyElements.forEach(el => {
       el.classList.add('hidden-in-guests');
     });
@@ -447,20 +455,15 @@ function switchTab(tabName) {
     photosFilters?.classList.remove('hidden');
     tablesFilters?.classList.add('hidden');
     
-    // Mostrar elementos de photos
+    // Esconder elementos de outras abas
     guestsOnlyElements.forEach(el => {
       el.classList.add('hidden-in-photos');
-    });
-    photosOnlyElements.forEach(el => {
-      el.classList.remove('hidden-in-guests');
     });
     tablesOnlyElements.forEach(el => {
       el.classList.add('hidden-in-photos');
     });
     
-    // Limpar status ao entrar na aba de fotos
     setStatus('');
-    
     loadPhotos();
     
   } else if (tabName === 'tables') {
@@ -468,24 +471,26 @@ function switchTab(tabName) {
     photosFilters?.classList.add('hidden');
     tablesFilters?.classList.remove('hidden');
     
-    // Mostrar elementos de tables
+    // Esconder elementos de outras abas
     guestsOnlyElements.forEach(el => {
       el.classList.add('hidden-in-tables');
     });
     photosOnlyElements.forEach(el => {
-      el.classList.add('hidden-in-photos');
-    });
-    tablesOnlyElements.forEach(el => {
-      el.classList.remove('hidden-in-guests');
-      el.classList.remove('hidden-in-photos');
+      el.classList.add('hidden-in-tables');
     });
     
-    // Limpar status
     setStatus('');
     
     // Carregar dados de mesas
     if (allPeople.length === 0) {
-      loadPeople().then(() => loadTablesArrangement());
+      loadPeople()
+        .then(() => loadTablesArrangement())
+        .catch(error => {
+          console.error('Erro ao carregar:', error);
+          if (error.message.includes('404')) {
+            setStatus('⚠️ Faça deploy do backend com os novos arquivos de mesas primeiro!', 'error');
+          }
+        });
     } else {
       loadTablesArrangement();
     }
@@ -808,9 +813,13 @@ const btnClearTables = document.getElementById('btn-clear-tables');
 // Carregar pessoas disponíveis
 async function loadPeople() {
   try {
+    console.log('Carregando pessoas...');
+    
     const response = await fetch(`${API_BASE_URL}/tables/people`, {
       headers: authedHeaders()
     });
+    
+    console.log('Response status:', response.status);
     
     if (response.status === 401) {
       clearToken();
@@ -818,13 +827,19 @@ async function loadPeople() {
       throw new Error("Não autorizado");
     }
     
-    if (!response.ok) throw new Error('Erro ao carregar pessoas');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Erro do servidor:', errorText);
+      throw new Error(`Erro ${response.status}: ${errorText}`);
+    }
     
     allPeople = await response.json();
+    console.log('Pessoas carregadas:', allPeople.length);
     
   } catch (error) {
-    console.error('Erro ao carregar pessoas:', error);
-    setStatus('Erro ao carregar lista de convidados', 'error');
+    console.error('Erro completo ao carregar pessoas:', error);
+    setStatus(`Erro ao carregar lista de convidados: ${error.message}`, 'error');
+    throw error;
   }
 }
 
