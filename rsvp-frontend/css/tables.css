@@ -1,0 +1,292 @@
+/* css/mesas-view.css */
+
+/* Hero compacto */
+.hero--compact {
+  padding: 2rem 7vw 1.5rem;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.hero-title {
+  font-family: "Eyesome Script", "Allura", cursive;
+  font-size: 2.5rem;
+  color: var(--pink);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+  font-family: "The Seasons", "Times New Roman", serif;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+/* Busca */
+.search-card {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.search-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  border-radius: 999px;
+  border: 2px solid var(--border-soft);
+  font-size: 1rem;
+  outline: none;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.search-input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(215, 68, 153, 0.15);
+  background: white;
+}
+
+.search-help {
+  text-align: center;
+  color: #6e5a6c;
+  font-size: 0.9rem;
+  min-height: 1.5em;
+}
+
+.search-help.highlight {
+  color: var(--pink);
+  font-weight: 600;
+}
+
+/* Containers de estado */
+.loading-container,
+.error-container,
+.empty-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6e5a6c;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(215, 68, 153, 0.2);
+  border-top-color: var(--pink);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-subtitle {
+  font-size: 0.9rem;
+  color: #999;
+  margin-top: 0.5rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Container de mesas */
+.tables-view-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 7vw 3rem;
+}
+
+@media (max-width: 768px) {
+  .tables-view-container {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+}
+
+/* Card da mesa */
+.table-view-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 242, 250, 0.95) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 232, 216, 0.95) 100%
+  );
+  border: 2px solid var(--border-soft);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(215, 68, 153, 0.15);
+  transition: all 0.3s ease;
+}
+
+.table-view-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(215, 68, 153, 0.25);
+}
+
+.table-view-card.highlighted {
+  border-color: var(--pink);
+  border-width: 3px;
+  box-shadow: 0 12px 40px rgba(215, 68, 153, 0.4);
+  animation: pulse 2s ease-in-out;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Header da mesa */
+.table-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(215, 68, 153, 0.2);
+}
+
+.table-view-title {
+  font-family: "Eyesome Script", "Allura", cursive;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--pink);
+  line-height: 1;
+}
+
+.table-view-count {
+  font-size: 0.85rem;
+  color: var(--orange);
+  font-weight: 700;
+  background: rgba(237, 88, 0, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(237, 88, 0, 0.2);
+}
+
+/* Lista de pessoas */
+.table-view-people {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.table-view-person {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(215, 68, 153, 0.15);
+  transition: all 0.2s ease;
+}
+
+.table-view-person:hover {
+  background: rgba(255, 242, 250, 0.9);
+  border-color: var(--pink);
+}
+
+.table-view-person.highlighted {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 242, 250, 0.95),
+    rgba(255, 232, 216, 0.95)
+  );
+  border-color: var(--pink);
+  border-width: 2px;
+  font-weight: 600;
+}
+
+.person-number {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--pink), var(--orange));
+  color: white;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(215, 68, 153, 0.3);
+}
+
+.person-name {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.table-view-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Footer */
+.footer-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--pink);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.footer-link:hover {
+  opacity: 0.7;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .table-view-title {
+    font-size: 1.6rem;
+  }
+
+  .search-input {
+    font-size: 0.95rem;
+    padding: 0.8rem 1rem;
+  }
+}

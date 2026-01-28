@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mesas da Festa - Formatura Duda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Allura&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/tables.css" />
+  </head>
+  <body>
+    <div class="page-bg-top"></div>
+    <div class="page-bg-bottom"></div>
+
+    <header class="hero hero--compact">
+      <div class="hero-content">
+        <img
+          src="img/logo-formatura.png"
+          alt="Formatura Duda"
+          class="hero-logo"
+        />
+        <h1 class="hero-title">Organização das Mesas</h1>
+        <p class="hero-subtitle">Formatura Duda • 07/02/2026</p>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="card search-card">
+        <div class="search-container">
+          <label for="search-name" class="search-label">
+            🔍 Buscar por nome
+          </label>
+          <input
+            type="text"
+            id="search-name"
+            class="search-input"
+            placeholder="Digite seu nome ou de um acompanhante..."
+            autocomplete="off"
+          />
+          <button class="btn-secondary" id="clear-search">Limpar busca</button>
+        </div>
+        <p class="search-help" id="search-status"></p>
+      </section>
+
+      <div id="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Carregando mesas...</p>
+      </div>
+
+      <div id="error" class="error-container hidden">
+        <p>Não foi possível carregar as mesas.</p>
+        <button class="btn-primary" onclick="location.reload()">
+          Tentar novamente
+        </button>
+      </div>
+
+      <div id="no-tables" class="empty-container hidden">
+        <p>Ainda não há mesas organizadas.</p>
+        <p class="empty-subtitle">
+          A organização será divulgada em breve!
+        </p>
+      </div>
+
+      <div id="tables-container" class="tables-view-container"></div>
+    </main>
+
+    <footer class="footer">
+      <p>Formatura Duda • Engenharia Computacional</p>
+      <a href="index.html" class="footer-link">← Voltar para confirmação</a>
+    </footer>
+
+    <script src="js/tables.js"></script>
+  </body>
+</html>

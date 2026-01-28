@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import TableArrangement
+from app.models_tables import TableArrangement
 from app.models import Guest, Companion
-from app.schemas import TableCreate, TableResponse, PersonInfo
+from app.schemas_tables import TableCreate, TableResponse, PersonInfo
 from app.security import require_admin
 
 
@@ -79,6 +79,65 @@ def get_arrangements(
             tables[arr.table_number].append(f"companion_{arr.companion_id}")
     
     return tables
+
+
+@router.get("/view", response_model=Dict[int, List[str]])
+def get_arrangements_public(db: Session = Depends(get_db)):
+    """
+    Endpoint PÚBLICO para visualização das mesas por convidados.
+    Não requer autenticação.
+    Formato: { mesa_numero: ["guest_123", "companion_456", ...] }
+    """
+    arrangements = db.query(TableArrangement).all()
+    
+    tables = {}
+    for arr in arrangements:
+        if arr.table_number not in tables:
+            tables[arr.table_number] = []
+        
+        if arr.guest_id:
+            tables[arr.table_number].append(f"guest_{arr.guest_id}")
+        elif arr.companion_id:
+            tables[arr.table_number].append(f"companion_{arr.companion_id}")
+    
+    return tables
+
+
+@router.get("/people/public", response_model=List[PersonInfo])
+def list_people_public(db: Session = Depends(get_db)):
+    """
+    Endpoint PÚBLICO - Lista pessoas para visualização das mesas.
+    Não requer autenticação.
+    """
+    # Pegar apenas convidados confirmados (YES)
+    confirmed_guests = db.query(Guest).filter(Guest.rsvp_status == "YES").all()
+    
+    people = []
+    
+    for guest in confirmed_guests:
+        # Adicionar convidado
+        people.append({
+            "id": f"guest_{guest.id}",
+            "name": guest.name,
+            "type": "guest",
+            "guest_name": None
+        })
+        
+        # Adicionar acompanhantes logo após o convidado
+        for companion in guest.companions:
+            people.append({
+                "id": f"companion_{companion.id}",
+                "name": f"  ↳ {companion.name}",  # Indentação visual
+                "type": "companion",
+                "guest_name": guest.name
+            })
+    
+    # Ordenar por nome do convidado principal
+    people.sort(key=lambda x: (
+        x["guest_name"] if x["guest_name"] else x["name"].strip("  ↳ ")
+    ).lower())
+    
+    return people
 
 
 @router.post("/arrangements", status_code=status.HTTP_201_CREATED)
