@@ -800,6 +800,7 @@ if (btnDownloadPhotos) {
 
 let allPeople = [];
 let tablesData = {};
+let tablesSeats = {}; // Armazena número de lugares por mesa
 let assignedPeople = new Set();
 
 // Elementos
@@ -883,13 +884,17 @@ if (btnGenerateTables) {
       return;
     }
     
-    // Manter dados das mesas existentes se possível
+    // Manter dados das mesas existentes
     const newTablesData = {};
+    const newTablesSeats = {};
+    
     for (let i = 1; i <= numTables; i++) {
       newTablesData[i] = tablesData[i] || [];
+      newTablesSeats[i] = tablesSeats[i] || 8; // Padrão 8 lugares
     }
     
     tablesData = newTablesData;
+    tablesSeats = newTablesSeats;
     renderTables();
     setStatus('');
   });
@@ -914,33 +919,89 @@ function renderTables() {
     });
   }
   
-  tablesContainer.innerHTML = tableNumbers.map(tableNum => {
+  tablesContainer.innerHTML = tableNumbers.map((tableNum, index) => {
     const people = tablesData[tableNum] || [];
+    const numSeats = tablesSeats[tableNum] || 8;
     const occupiedSeats = people.filter(p => p).length;
+    const isFirst = index === 0;
+    const isLast = index === tableNumbers.length - 1;
     
     return `
       <div class="table-card" data-table="${tableNum}">
         <div class="table-card__header">
-          <h3 class="table-card__title">Mesa ${tableNum}</h3>
-          <span class="table-card__count">${occupiedSeats}/8 lugares</span>
+          <div class="table-card__controls">
+            <div class="table-card__order-buttons">
+              <button 
+                class="order-btn" 
+                data-table="${tableNum}" 
+                data-action="up"
+                ${isFirst ? 'disabled' : ''}
+                title="Mover para cima"
+              >
+                ▲
+              </button>
+              <button 
+                class="order-btn" 
+                data-table="${tableNum}" 
+                data-action="down"
+                ${isLast ? 'disabled' : ''}
+                title="Mover para baixo"
+              >
+                ▼
+              </button>
+            </div>
+            <h3 class="table-card__title">Mesa ${tableNum}</h3>
+          </div>
+          
+          <div class="table-card__controls">
+            <div class="seats-control">
+              <span class="seats-control__label">Lugares:</span>
+              <button 
+                class="seats-control__btn" 
+                data-table="${tableNum}" 
+                data-action="decrease"
+                ${numSeats <= 4 ? 'disabled' : ''}
+              >
+                −
+              </button>
+              <input 
+                type="number" 
+                class="seats-control__input" 
+                data-table="${tableNum}"
+                value="${numSeats}" 
+                min="4" 
+                max="20"
+              />
+              <button 
+                class="seats-control__btn" 
+                data-table="${tableNum}" 
+                data-action="increase"
+                ${numSeats >= 20 ? 'disabled' : ''}
+              >
+                +
+              </button>
+            </div>
+            <span class="table-card__count">${occupiedSeats}/${numSeats}</span>
+          </div>
         </div>
+        
         <div class="table-card__seats">
-          ${[1, 2, 3, 4, 5, 6, 7, 8].map(seatNum => `
-            <div class="table-seat">
-              <div class="table-seat__number">${seatNum}</div>
+          ${Array.from({length: numSeats}, (_, i) => i).map(seatNum => `
+            <div class="table-seat" data-table="${tableNum}" data-seat="${seatNum}">
+              <div class="table-seat__number">${seatNum + 1}</div>
               <select 
                 class="table-seat__select" 
                 data-table="${tableNum}" 
-                data-seat="${seatNum - 1}"
+                data-seat="${seatNum}"
               >
                 <option value="">-- Vazio --</option>
-                ${renderPeopleOptions(people[seatNum - 1])}
+                ${renderPeopleOptions(people[seatNum])}
               </select>
-              ${people[seatNum - 1] ? `
+              ${people[seatNum] ? `
                 <button 
                   class="table-seat__remove" 
                   data-table="${tableNum}" 
-                  data-seat="${seatNum - 1}"
+                  data-seat="${seatNum}"
                   title="Remover pessoa"
                 >
                   ×
@@ -953,13 +1014,28 @@ function renderTables() {
     `;
   }).join('');
   
-  // Adicionar event listeners
+  // Event listeners para selects
   tablesContainer.querySelectorAll('.table-seat__select').forEach(select => {
     select.addEventListener('change', handleSeatChange);
   });
   
+  // Event listeners para botões de remover
   tablesContainer.querySelectorAll('.table-seat__remove').forEach(btn => {
     btn.addEventListener('click', handleRemovePerson);
+  });
+  
+  // Event listeners para botões de ordenação
+  tablesContainer.querySelectorAll('.order-btn').forEach(btn => {
+    btn.addEventListener('click', handleTableOrder);
+  });
+  
+  // Event listeners para controle de lugares
+  tablesContainer.querySelectorAll('.seats-control__btn').forEach(btn => {
+    btn.addEventListener('click', handleSeatsControl);
+  });
+  
+  tablesContainer.querySelectorAll('.seats-control__input').forEach(input => {
+    input.addEventListener('change', handleSeatsInputChange);
   });
 }
 
@@ -1101,4 +1177,134 @@ if (btnClearTables) {
       btnClearTables.disabled = false;
     }
   });
+}
+
+/* ============================= */
+/*  DRAG AND DROP - MESAS        */
+/* ============================= */
+
+let draggedTableNumber = null;
+
+function setupTableDragAndDrop() {
+  const tableCards = tablesContainer.querySelectorAll('.table-card');
+  
+  tableCards.forEach(card => {
+    card.addEventListener('dragstart', handleTableDragStart);
+    card.addEventListener('dragend', handleTableDragEnd);
+    card.addEventListener('dragover', handleTableDragOver);
+    card.addEventListener('drop', handleTableDrop);
+  });
+}
+
+function handleTableDragStart(e) {
+  // Só permitir arrastar pelo header
+  if (!e.target.classList.contains('table-card__header') && 
+      !e.target.closest('.table-card__header')) {
+    e.preventDefault();
+    return;
+  }
+}
+
+/* ============================= */
+/*  ORDENAÇÃO DE MESAS           */
+/* ============================= */
+
+function handleTableOrder(e) {
+  const btn = e.currentTarget;
+  const tableNum = btn.dataset.table;
+  const action = btn.dataset.action;
+  
+  const tableNumbers = Object.keys(tablesData).sort((a, b) => Number(a) - Number(b));
+  const currentIndex = tableNumbers.indexOf(tableNum);
+  
+  if (action === 'up' && currentIndex > 0) {
+    // Trocar com a mesa anterior
+    const prevTableNum = tableNumbers[currentIndex - 1];
+    swapTables(tableNum, prevTableNum);
+  } else if (action === 'down' && currentIndex < tableNumbers.length - 1) {
+    // Trocar com a próxima mesa
+    const nextTableNum = tableNumbers[currentIndex + 1];
+    swapTables(tableNum, nextTableNum);
+  }
+}
+
+function swapTables(tableNum1, tableNum2) {
+  // Trocar dados
+  const tempData = tablesData[tableNum1];
+  tablesData[tableNum1] = tablesData[tableNum2];
+  tablesData[tableNum2] = tempData;
+  
+  // Trocar número de lugares
+  const tempSeats = tablesSeats[tableNum1];
+  tablesSeats[tableNum1] = tablesSeats[tableNum2];
+  tablesSeats[tableNum2] = tempSeats;
+  
+  renderTables();
+}
+
+/* ============================= */
+/*  CONTROLE DE LUGARES          */
+/* ============================= */
+
+function handleSeatsControl(e) {
+  const btn = e.currentTarget;
+  const tableNum = btn.dataset.table;
+  const action = btn.dataset.action;
+  
+  let currentSeats = tablesSeats[tableNum] || 8;
+  
+  if (action === 'increase' && currentSeats < 20) {
+    currentSeats++;
+  } else if (action === 'decrease' && currentSeats > 4) {
+    // Verificar se não há pessoas nos lugares que serão removidos
+    const people = tablesData[tableNum] || [];
+    const hasPersonInLastSeat = people[currentSeats - 1];
+    
+    if (hasPersonInLastSeat) {
+      setStatus('Remova a pessoa do último lugar antes de diminuir', 'error');
+      setTimeout(() => setStatus(''), 2000);
+      return;
+    }
+    
+    currentSeats--;
+    // Remover o último lugar vazio
+    tablesData[tableNum] = people.slice(0, currentSeats);
+  }
+  
+  tablesSeats[tableNum] = currentSeats;
+  renderTables();
+}
+
+function handleSeatsInputChange(e) {
+  const input = e.currentTarget;
+  const tableNum = input.dataset.table;
+  let newSeats = parseInt(input.value);
+  
+  // Validar
+  if (isNaN(newSeats) || newSeats < 4) {
+    newSeats = 4;
+  } else if (newSeats > 20) {
+    newSeats = 20;
+  }
+  
+  const currentSeats = tablesSeats[tableNum] || 8;
+  
+  if (newSeats < currentSeats) {
+    // Verificar se não há pessoas nos lugares que serão removidos
+    const people = tablesData[tableNum] || [];
+    const hasPersonInRemovedSeats = people.slice(newSeats).some(p => p);
+    
+    if (hasPersonInRemovedSeats) {
+      setStatus('Remova as pessoas dos últimos lugares antes de diminuir', 'error');
+      setTimeout(() => setStatus(''), 2000);
+      input.value = currentSeats;
+      return;
+    }
+    
+    // Remover lugares vazios extras
+    tablesData[tableNum] = people.slice(0, newSeats);
+  }
+  
+  tablesSeats[tableNum] = newSeats;
+  renderTables();
 }

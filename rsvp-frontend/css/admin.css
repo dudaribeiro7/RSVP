@@ -752,6 +752,8 @@
   margin-bottom: 1.2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid rgba(215, 68, 153, 0.2);
+  gap: 0.8rem;
+  flex-wrap: wrap;
 }
 
 .table-card__title {
@@ -910,4 +912,106 @@
 
 .hidden-in-tables {
   display: none !important;
+}
+
+/* ============================= */
+/*  DRAG AND DROP                */
+/* ============================= */
+
+.table-card__controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.table-card__order-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.order-btn {
+  width: 28px;
+  height: 22px;
+  border: 0;
+  background: rgba(215, 68, 153, 0.15);
+  color: var(--pink);
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.order-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--pink), var(--orange));
+  color: white;
+  transform: scale(1.1);
+}
+
+.order-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.seats-control {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+}
+
+.seats-control__label {
+  font-size: 0.75rem;
+  color: #6e5a6c;
+  white-space: nowrap;
+}
+
+.seats-control__input {
+  width: 45px;
+  padding: 0.3rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-soft);
+  font-size: 0.85rem;
+  text-align: center;
+  font-weight: 600;
+  color: var(--pink);
+}
+
+.seats-control__input:focus {
+  outline: none;
+  border-color: var(--pink);
+  box-shadow: 0 0 0 2px rgba(215, 68, 153, 0.15);
+}
+
+.seats-control__btn {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: rgba(215, 68, 153, 0.15);
+  color: var(--pink);
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.seats-control__btn:hover:not(:disabled) {
+  background: var(--pink);
+  color: white;
+  transform: scale(1.1);
+}
+
+.seats-control__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
