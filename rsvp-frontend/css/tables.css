@@ -240,6 +240,7 @@
   font-size: 0.95rem;
   color: var(--text);
   text-align: center;
+  font-family: "The Seasons", "Times New Roman", serif;
 }
 
 .table-view-empty {
