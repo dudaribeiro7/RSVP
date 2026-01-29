@@ -1,0 +1,387 @@
+/* css/home.css */
+
+/* Main container */
+.home-main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hero section */
+.home-hero {
+  padding: 3rem 7vw 2rem;
+  text-align: center;
+}
+
+.home-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.home-logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  animation: fadeInDown 1s ease;
+}
+
+.home-title {
+  font-family: "Eyesome Script", "Allura", cursive;
+  font-size: 3.5rem;
+  color: var(--pink);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  animation: fadeInUp 1s ease 0.2s backwards;
+}
+
+.home-subtitle {
+  font-family: "The Seasons", "Times New Roman", serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 1s ease 0.4s backwards;
+}
+
+.home-date {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(215, 68, 153, 0.1), rgba(237, 88, 0, 0.1));
+  padding: 0.8rem 2rem;
+  border-radius: 999px;
+  border: 2px solid var(--pink);
+  animation: fadeInUp 1s ease 0.6s backwards;
+}
+
+.home-date-day {
+  font-family: "The Seasons", "Times New Roman", serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--pink);
+  letter-spacing: 0.05em;
+}
+
+/* ===== BLOCO DA DATA ===== */
+
+.home-date-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4rem;
+  animation: fadeInUp 1s ease 0.6s backwards;
+}
+
+/* Laterais (SÁBADO / 16 HORAS) */
+.home-date-block {
+  padding: 0.3rem 0.5rem;
+  border-top: 1px solid var(--pink);
+  border-bottom: 1px solid var(--pink);
+  margin-left: -20px;
+  margin-right: -20px;
+}
+
+.home-date-label {
+  font-family: serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+}
+
+/* Bloco central */
+.home-date-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ajustes do arco */
+.home-month-arc {
+  margin-bottom: -65px; 
+  overflow: visible;
+  align-items: center;
+}
+
+.home-month-arc text {
+  font-family: "The Seasons", serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+}
+
+/* O número 07 */
+.home-day {
+  font-family: "Brasika", serif;
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--orange);
+}
+
+/* Menu section */
+.home-menu {
+  flex: 1;
+  padding: 2rem 7vw;
+}
+
+.home-menu-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.menu-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 242, 250, 0.95) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 232, 216, 0.95) 100%
+  );
+  border: 2px solid var(--border-soft);
+  border-radius: 24px;
+  padding: 2rem;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(215, 68, 153, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeInUp 1s ease backwards;
+}
+
+.menu-card:nth-child(1) {
+  animation-delay: 0.8s;
+}
+
+.menu-card:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.menu-card:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+.menu-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(215, 68, 153, 0.25);
+  border-color: var(--pink);
+}
+
+.menu-card--primary {
+  border-width: 3px;
+  border-color: var(--pink);
+}
+
+.menu-card__icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.menu-card__title {
+  font-family: "Eyesome Script", "Allura", cursive;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--pink);
+  margin: 0;
+}
+
+.menu-card__description {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.95rem;
+  color: #6e5a6c;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.menu-card__cta {
+  font-family: "The Seasons", "Times New Roman", serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--pink);
+  margin-top: auto;
+  letter-spacing: 0.05em;
+}
+
+.menu-card:hover .menu-card__cta {
+  color: var(--orange);
+}
+
+/* Info section */
+.home-info {
+  padding: 2rem 7vw 3rem;
+}
+
+.home-info-content {
+  max-width: 1200px;
+  margin: 0 auto 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.home-info-content--secondary {
+  margin-bottom: 0;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  animation: fadeInUp 1s ease 1.4s backwards;
+}
+
+.info-card--full {
+  grid-column: 1 / -1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.info-card--highlight {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 242, 250, 0.7) 0%,
+    rgba(255, 232, 216, 0.7) 100%
+  );
+  border-color: rgba(215, 68, 153, 0.3);
+}
+
+.info-card__title {
+  font-family: "The Seasons", "Times New Roman", serif;
+  font-size: 1.1rem;
+  color: var(--pink);
+  margin-bottom: 0.8rem;
+}
+
+.info-card__text {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.info-card__text strong {
+  color: var(--pink);
+  font-weight: 600;
+}
+
+.info-card__hint {
+  font-size: 0.85rem;
+  color: #999;
+  font-style: italic;
+}
+
+.info-card__link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, var(--pink), var(--orange));
+  color: white;
+  text-decoration: none;
+  border-radius: 999px;
+  font-family: "The Seasons", "Times New Roman", serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(215, 68, 153, 0.3);
+}
+
+.info-card__link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(215, 68, 153, 0.4);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  /* padding: 2rem 7vw; */
+  /* border-top: 1px solid var(--border-soft); */
+  animation: fadeIn 1s ease 1.6s backwards;
+}
+
+.footer p {
+  margin: 0.3rem 0;
+  font-size: 0.9rem;
+  color: #6e5a6c;
+}
+
+.footer-date {
+  font-family: "The Seasons", "Times New Roman", serif;
+  font-weight: 600;
+  color: var(--pink);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .home-title {
+    font-size: 2.8rem;
+  }
+
+  .home-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .home-date-day {
+    font-size: 1rem;
+  }
+
+  .home-menu-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .menu-card__title {
+    font-size: 1.8rem;
+  }
+
+  .home-info-content {
+    grid-template-columns: 1fr;
+  }
+
+  .info-card--full {
+    grid-column: 1;
+  }
+
+  .home-date-card {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-day {
+    font-size: 2.4rem;
+  }
+}

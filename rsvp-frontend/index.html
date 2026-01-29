@@ -2,7 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title>Formatura Duda – Confirmação de Presença</title>
+    <title>Formatura Duda - 07/02/2026</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link
@@ -10,32 +10,32 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/home.css" />
   </head>
   <body>
     <div class="page-bg-top"></div>
     <div class="page-bg-bottom"></div>
 
-    <header class="hero">
-      <div class="hero-left">
+    <main class="home-main">
+      <header class="home-hero">
+      <div class="home-hero-content">
         <img
           src="img/logo-formatura.png"
           alt="Formatura Duda"
-          class="hero-logo"
+          class="home-logo" 
         />
-      </div>
-      <div class="hero-right">
-        <h1 class="hero-title">Formatura Duda</h1>
-        <p class="hero-subtitle">Engenharia Computacional</p>
+        <h1 class="home-title">Formatura Duda</h1>
+        <p class="home-subtitle">Engenharia Computacional</p>
 
-        <div class="hero-date-card">
-          <div class="hero-date-block">
-            <span class="hero-date-label">SÁBADO</span>
+        <div class="home-date-card">
+          <div class="home-date-block">
+            <span class="home-date-label">SÁBADO</span>
           </div>
 
-          <div class="hero-date-center">
-            <svg class="month-arc" width="170" height="65" viewBox="0 0 170 65">
+          <div class="home-date-center">
+            <svg class="home-month-arc" width="170" height="65" viewBox="0 0 170 65">
               <defs>
-                <path id="arcPath" d="M15,55 A70,70 0 0,1 155,55" />
+                <path id="home-arcPath" d="M15,55 A70,70 0 0,1 155,55" />
               </defs>
 
               <text
@@ -45,7 +45,7 @@
                 letter-spacing="3"
               >
                 <textPath
-                  href="#arcPath"
+                  href="#home-arcPath"
                   startOffset="50%"
                   text-anchor="middle"
                 >
@@ -54,139 +54,99 @@
               </text>
             </svg>
 
-            <span class="hero-day">07</span>
+            <span class="home-day">07</span>
           </div>
 
-          <div class="hero-date-block">
-            <span class="hero-date-label">16h - 00h</span>
+          <div class="home-date-block">
+            <span class="home-date-label">16h - 00h</span>
           </div>
         </div>
-
-        <p class="hero-location">
-          Rua Antônio Azalin Silva, 4<br />
-          Granjas Santo Antônio, Juiz de Fora – MG
-        </p>
-
-        <a
-          class="hero-map-link"
-          href="https://maps.app.goo.gl/qMJ5176xKYdCtGSC9?g_st=ipc"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="hero-map-icon">📍</span>
-          Clique aqui para ver a localização
-        </a>
       </div>
     </header>
 
-    <main class="main">
-      <section class="card">
-        <h2 class="card-title">Confirmação de presença</h2>
-        <p class="card-text">Favor responder até <strong>31/01</strong>.</p>
-
-        <form id="rsvp-form" class="rsvp-form" novalidate autocomplete="on">
-          <div class="form-group">
-            <label for="name"
-              >Seu nome completo <span style="color: red">*</span></label
-            >
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              placeholder="Ex: Maria Eduarda Ribeiro Facio"
-              autocomplete="name"
-            />
-            <span class="input-error"></span>
-          </div>
-
-          <div class="form-group">
-            <label for="phone"
-              >Telefone / WhatsApp <span style="color: red">*</span></label
-            >
-            <input
-              id="phone"
-              name="phone"
-              type="text"
-              required
-              placeholder="(00) 00000-0000"
-              autocomplete="tel"
-            />
-            <span class="input-error"></span>
-          </div>
-
-          <!-- NOVO: status do RSVP -->
-          <div class="form-group">
-            <label>Você vai? <span style="color: red">*</span></label>
-            <div class="radio-group" id="rsvp-status-group">
-              <label class="radio-option">
-                <input type="radio" name="rsvp_status" value="YES" />
-                Vou
-              </label>
-              <label class="radio-option">
-                <input type="radio" name="rsvp_status" value="NO" />
-                Não vou
-              </label>
-              <label class="radio-option">
-                <input type="radio" name="rsvp_status" value="MAYBE" />
-                Talvez
-              </label>
-            </div>
-            <span class="input-error" id="rsvp-status-error"></span>
-          </div>
-
-          <!-- Acompanhantes só quando marcar "Vou" -->
-          <div
-            class="form-group companions-group hidden"
-            id="companions-section"
-          >
-            <div class="companions-header">
-              <label>Acompanhantes</label>
-              <button type="button" id="add-companion" class="btn-secondary">
-                + Adicionar acompanhante
-              </button>
-            </div>
-            <p class="help-text">
-              Se for levar alguém, preencha o nome completo de cada
-              acompanhante.
+      <section class="home-menu">
+        <div class="home-menu-container">
+          <!-- <a href="rsvp.html" class="menu-card">
+            <div class="menu-card__icon">🎉</div>
+            <h2 class="menu-card__title">Confirmar Presença</h2>
+            <p class="menu-card__description">
+              Confirme sua presença e me conte se virá acompanhado(a)
             </p>
-            <div id="companions-container"></div>
-          </div>
+            <span class="menu-card__cta">Confirmar agora →</span>
+          </a> -->
 
-          <!-- NOVO: recado -->
-          <div class="form-group">
-            <label for="note">Quer deixar um recado?</label>
-            <input id="note" name="note" placeholder="Opcional" />
-          </div>
+          <a href="photos.html" class="menu-card">
+            <div class="menu-card__icon">📸</div>
+            <h2 class="menu-card__title">Enviar Fotos</h2>
+            <p class="menu-card__description">
+              Compartilhe suas fotos e momentos especiais da festa
+            </p>
+            <span class="menu-card__cta">Enviar fotos →</span>
+          </a>
 
-          <div class="form-footer">
-            <button type="submit" class="btn-primary" id="submit-btn">
-              Enviar resposta
-            </button>
-            <p class="status-message" id="status-message"></p>
-          </div>
-        </form>
+          <a href="tables.html" class="menu-card">
+            <div class="menu-card__icon">🪑</div>
+            <h2 class="menu-card__title">Ver Mesas</h2>
+            <p class="menu-card__description">
+              Descubra em qual mesa você irá ficar
+            </p>
+            <span class="menu-card__cta">Ver organização →</span>
+          </a>
+        </div>
       </section>
 
-      <section class="card">
-        <h2 class="card-title">Menu & Bar</h2>
+      <section class="home-info">
+        <div class="home-info-content">
+          <div class="info-card">
+            <h3 class="info-card__title">📍 Local</h3>
+            <p class="info-card__text">
+              Rua Antônio Azalin Silva, 4<br />
+              Granjas Santo Antônio<br />
+              Juiz de Fora - MG
+            </p>
+            <span class="info-card__hint">Ao lado do Riche Motel e Feat Suítes</span>
+            <a
+              class="info-card__link"
+              href="https://maps.app.goo.gl/qMJ5176xKYdCtGSC9?g_st=ipc"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              📍 Ver no Google Maps
+            </a>
+          </div>
 
-        <div class="img-grid">
-          <img
-            class="img-poster js-open-modal"
-            src="img/menu.png"
-            alt="Menu da festa"
-            loading="lazy"
-            data-title="Menu"
-          />
-          <img
-            class="img-poster js-open-modal"
-            src="img/bar.png"
-            alt="Bar da festa"
-            loading="lazy"
-            data-title="Bar"
-          />
+          <div class="info-card">
+            <h3 class="info-card__title">👗 Traje</h3>
+            <p class="info-card__text">
+              Casual Chic<br />
+              <span class="info-card__hint">Descontraído e estiloso</span>
+            </p>
+          </div>
         </div>
+
+        <div class="home-info-content">
+          
+          <div class="info-card">
+              <img
+              class="img-poster js-open-modal"
+              src="img/menu.png"
+              alt="Menu da festa"
+              loading="lazy"
+              data-title="Menu"
+              />
+            </div>
+
+            <div class="info-card">
+            <img
+              class="img-poster js-open-modal"
+              src="img/bar.png"
+              alt="Bar da festa"
+              loading="lazy"
+              data-title="Bar"
+            />
+          </div>
+        </div>
+
       </section>
 
       <!-- Modal (só vai ser usado no PC) -->
@@ -201,16 +161,10 @@
           <img id="img-modal-img" alt="" />
         </div>
       </div>
-
-      <!-- <section class="extra-info">
-      <h3 class="extra-title">OPEN BAR • OPEN FOOD</h3>
-    </section> -->
     </main>
 
     <footer class="footer">
-      <p>Formatura Duda • Engenharia Computacional</p>
+      <p>Formatura Duda • Engenharia Computacional • UFJF</p>
     </footer>
-
-    <script src="js/rsvp.js"></script>
   </body>
 </html>
