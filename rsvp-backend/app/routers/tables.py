@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models_tables import TableArrangement
+from app.models import TableArrangement
 from app.models import Guest, Companion
-from app.schemas_tables import TableCreate, TableResponse, PersonInfo
+from app.schemas import TableCreate, TableResponse, PersonInfo
 from app.security import require_admin
 
 
