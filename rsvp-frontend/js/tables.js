@@ -1,6 +1,6 @@
 // js/mesas-view.js
 
-const API_BASE_URL = "https://rsvp-api-o8zt.onrender.com";
+const API_URL = "https://rsvp-api-o8zt.onrender.com"; // Ajuste para a URL do seu backend
 
 // Elementos
 const searchInput = document.getElementById('search-name');
@@ -33,7 +33,7 @@ async function loadTablesData() {
     console.log('Carregando pessoas...');
     
     // Carregar lista de pessoas (endpoint público)
-    const peopleResponse = await fetch(`${API_BASE_URL}/tables/people/public`);
+    const peopleResponse = await fetch(`${API_URL}/tables/people/public`);
     console.log('People response status:', peopleResponse.status);
     
     if (!peopleResponse.ok) {
@@ -53,7 +53,7 @@ async function loadTablesData() {
     console.log('Carregando mesas...');
     
     // Carregar arranjo de mesas (endpoint público)
-    const tablesResponse = await fetch(`${API_BASE_URL}/tables/view`);
+    const tablesResponse = await fetch(`${API_URL}/tables/view`);
     console.log('Tables response status:', tablesResponse.status);
     
     if (!tablesResponse.ok) {
@@ -116,13 +116,16 @@ function renderTables(searchQuery = '') {
   }
 
   let foundTables = 0;
-  let highlightedPerson = null;
+  let matchedPeople = [];
 
-  tablesContainer.innerHTML = tableNumbers
+  // Normalizar busca (remover acentos e converter para minúsculas)
+  const normalizedQuery = searchQuery ? normalizeText(searchQuery) : '';
+
+  const renderedTables = tableNumbers
     .map((tableNum) => {
       const peopleIds = allTables[tableNum] || [];
       
-      if (peopleIds.length === 0) return ''; // Não mostrar mesas vazias
+      if (peopleIds.length === 0) return null; // Não mostrar mesas vazias
 
       // Obter informações das pessoas
       const peopleInfo = peopleIds
@@ -132,18 +135,24 @@ function renderTables(searchQuery = '') {
           const person = allPeople.find((p) => p.id === personId);
           if (!person) return null;
 
+          // Remover setinhas de acompanhante e limpar nome
+          const cleanName = person.name.replace('  ↳ ', '').trim();
+
+          // Normalizar nome para comparação
+          const normalizedName = normalizeText(cleanName);
+
           // Verificar se a pessoa corresponde à busca
           const isMatch =
-            searchQuery &&
-            person.name.toLowerCase().includes(searchQuery.toLowerCase());
+            normalizedQuery &&
+            normalizedName.includes(normalizedQuery);
 
           if (isMatch) {
-            highlightedPerson = person.name;
+            matchedPeople.push(cleanName);
           }
 
           return {
             number: index + 1,
-            name: person.name,
+            name: cleanName,
             isMatch,
           };
         })
@@ -151,8 +160,8 @@ function renderTables(searchQuery = '') {
 
       // Se está buscando, só mostrar mesas que têm match
       const hasMatch = peopleInfo.some((p) => p.isMatch);
-      if (searchQuery && !hasMatch) {
-        return '';
+      if (normalizedQuery && !hasMatch) {
+        return null;
       }
 
       foundTables++;
@@ -161,16 +170,12 @@ function renderTables(searchQuery = '') {
         <div class="table-view-card ${hasMatch ? 'highlighted' : ''}">
           <div class="table-view-header">
             <h3 class="table-view-title">Mesa ${tableNum}</h3>
-            <span class="table-view-count">${peopleInfo.length} ${
-        peopleInfo.length === 1 ? 'pessoa' : 'pessoas'
-      }</span>
           </div>
           <div class="table-view-people">
             ${peopleInfo
               .map(
                 (person) => `
               <div class="table-view-person ${person.isMatch ? 'highlighted' : ''}">
-                <div class="person-number">${person.number}</div>
                 <div class="person-name">${escapeHtml(person.name)}</div>
               </div>
             `
@@ -183,8 +188,20 @@ function renderTables(searchQuery = '') {
     .filter(Boolean)
     .join('');
 
+  tablesContainer.innerHTML = renderedTables;
+
   // Atualizar mensagem de status
-  updateSearchStatus(searchQuery, foundTables, highlightedPerson);
+  updateSearchStatus(searchQuery, foundTables, matchedPeople);
+}
+
+// Função para normalizar texto (remover acentos e converter para minúsculas)
+function normalizeText(text) {
+  if (!text) return '';
+  
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''); // Remove acentos
 }
 
 function handleSearch(e) {
@@ -198,7 +215,7 @@ function clearSearch() {
   searchInput.focus();
 }
 
-function updateSearchStatus(query, foundTables, highlightedPerson) {
+function updateSearchStatus(query, foundTables, matchedPeople) {
   if (!searchStatus) return;
 
   if (!query) {
@@ -210,11 +227,18 @@ function updateSearchStatus(query, foundTables, highlightedPerson) {
   if (foundTables === 0) {
     searchStatus.textContent = `Nenhuma mesa encontrada para "${query}"`;
     searchStatus.classList.remove('highlight');
-  } else if (foundTables === 1) {
-    searchStatus.textContent = `✓ ${highlightedPerson} está na mesa destacada abaixo`;
+  } else if (foundTables === 1 && matchedPeople.length === 1) {
+    // 1 mesa, 1 pessoa
+    const personName = matchedPeople[0].replace('  ↳ ', '').trim();
+    searchStatus.textContent = `✓ ${personName} está na mesa destacada abaixo`;
+    searchStatus.classList.add('highlight');
+  } else if (foundTables === 1 && matchedPeople.length > 1) {
+    // 1 mesa, múltiplas pessoas
+    searchStatus.textContent = `✓ ${matchedPeople.length} pessoas encontradas na mesa destacada`;
     searchStatus.classList.add('highlight');
   } else {
-    searchStatus.textContent = `${foundTables} mesas encontradas`;
+    // Múltiplas mesas
+    searchStatus.textContent = `✓ ${matchedPeople.length} ${matchedPeople.length === 1 ? 'pessoa encontrada' : 'pessoas encontradas'} em ${foundTables} mesas`;
     searchStatus.classList.add('highlight');
   }
 }

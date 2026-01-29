@@ -173,7 +173,7 @@
 /* Header da mesa */
 .table-view-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
@@ -186,6 +186,7 @@
   font-weight: 400;
   color: var(--pink);
   line-height: 1;
+  text-align: center;
 }
 
 .table-view-count {
@@ -208,6 +209,7 @@
 .table-view-person {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.6rem;
   padding: 0.7rem 0.9rem;
   background: rgba(255, 255, 255, 0.7);
@@ -232,25 +234,11 @@
   font-weight: 600;
 }
 
-.person-number {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--pink), var(--orange));
-  color: white;
-  border-radius: 50%;
-  font-size: 0.8rem;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(215, 68, 153, 0.3);
-}
-
 .person-name {
   flex: 1;
   font-size: 0.95rem;
   color: var(--text);
+  text-align: center;
 }
 
 .table-view-empty {
