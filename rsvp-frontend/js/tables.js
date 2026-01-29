@@ -1,6 +1,6 @@
 // js/mesas-view.js
 
-const API_URL = "https://rsvp-backend-production.up.railway.app"; // Ajuste para a URL do seu backend
+const API_BASE_URL = "https://rsvp-api-o8zt.onrender.com";
 
 // Elementos
 const searchInput = document.getElementById('search-name');
@@ -33,7 +33,7 @@ async function loadTablesData() {
     console.log('Carregando pessoas...');
     
     // Carregar lista de pessoas (endpoint público)
-    const peopleResponse = await fetch(`${API_URL}/tables/people/public`);
+    const peopleResponse = await fetch(`${API_BASE_URL}/tables/people/public`);
     console.log('People response status:', peopleResponse.status);
     
     if (!peopleResponse.ok) {
@@ -53,7 +53,7 @@ async function loadTablesData() {
     console.log('Carregando mesas...');
     
     // Carregar arranjo de mesas (endpoint público)
-    const tablesResponse = await fetch(`${API_URL}/tables/view`);
+    const tablesResponse = await fetch(`${API_BASE_URL}/tables/view`);
     console.log('Tables response status:', tablesResponse.status);
     
     if (!tablesResponse.ok) {
