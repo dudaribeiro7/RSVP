@@ -30,15 +30,44 @@ async function loadTablesData() {
     noTablesEl?.classList.add('hidden');
     tablesContainer.innerHTML = '';
 
+    console.log('Carregando pessoas...');
+    
     // Carregar lista de pessoas (endpoint público)
     const peopleResponse = await fetch(`${API_URL}/tables/people/public`);
-    if (!peopleResponse.ok) throw new Error('Erro ao carregar pessoas');
+    console.log('People response status:', peopleResponse.status);
+    
+    if (!peopleResponse.ok) {
+      const errorText = await peopleResponse.text();
+      console.error('Erro ao carregar pessoas:', errorText);
+      
+      // Se o endpoint não existe (404), mostrar mensagem específica
+      if (peopleResponse.status === 404) {
+        throw new Error('BACKEND_NOT_DEPLOYED');
+      }
+      throw new Error('Erro ao carregar pessoas');
+    }
+    
     allPeople = await peopleResponse.json();
+    console.log('Pessoas carregadas:', allPeople.length);
 
+    console.log('Carregando mesas...');
+    
     // Carregar arranjo de mesas (endpoint público)
     const tablesResponse = await fetch(`${API_URL}/tables/view`);
-    if (!tablesResponse.ok) throw new Error('Erro ao carregar mesas');
+    console.log('Tables response status:', tablesResponse.status);
+    
+    if (!tablesResponse.ok) {
+      const errorText = await tablesResponse.text();
+      console.error('Erro ao carregar mesas:', errorText);
+      
+      if (tablesResponse.status === 404) {
+        throw new Error('BACKEND_NOT_DEPLOYED');
+      }
+      throw new Error('Erro ao carregar mesas');
+    }
+    
     allTables = await tablesResponse.json();
+    console.log('Mesas carregadas:', Object.keys(allTables).length);
 
     loadingEl?.classList.add('hidden');
 
@@ -51,8 +80,27 @@ async function loadTablesData() {
     renderTables();
 
   } catch (error) {
-    console.error('Erro ao carregar dados:', error);
+    console.error('Erro completo:', error);
     loadingEl?.classList.add('hidden');
+    
+    if (error.message === 'BACKEND_NOT_DEPLOYED') {
+      if (errorEl) {
+        errorEl.innerHTML = `
+          <p style="color: var(--pink); font-weight: 600;">
+            ⚠️ Backend ainda não atualizado
+          </p>
+          <p style="margin-top: 0.5rem;">
+            Faça o deploy do backend com os novos endpoints antes de usar esta página.
+          </p>
+          <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+            Endpoints necessários:<br>
+            • GET /tables/view<br>
+            • GET /tables/people/public
+          </p>
+        `;
+      }
+    }
+    
     errorEl?.classList.remove('hidden');
   }
 }
