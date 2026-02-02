@@ -480,3 +480,80 @@
     font-size: 2.4rem;
   }
 }
+
+/* ============================= */
+/*  MODAL DE FOTO                */
+/* ============================= */
+
+.photo-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 9999;
+}
+
+.photo-modal.is-open {
+  display: block;
+}
+
+.photo-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.photo-modal__content {
+  position: absolute;
+  inset: 4vh 4vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.photo-modal__content img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.photo-modal__close {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  border: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--pink);
+  font-size: 1.8rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease;
+  z-index: 10000;
+}
+
+.photo-modal__close:hover {
+  transform: scale(1.1);
+}
+
+/* ============================= */
+/*  IMG POSTERS (Menu e Bar)     */
+/* ============================= */
+
+.img-poster {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.img-poster:hover {
+  transform: scale(1.02);
+}

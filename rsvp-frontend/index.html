@@ -151,37 +151,35 @@
           
           <div class="info-card">
               <img
-              class="img-poster js-open-modal"
+              class="img-poster js-open-photo"
               src="img/menu.png"
               alt="Menu da festa"
               loading="lazy"
-              data-title="Menu"
+              data-full-url="img/menu.png"
               />
             </div>
 
             <div class="info-card">
             <img
-              class="img-poster js-open-modal"
+              class="img-poster js-open-photo"
               src="img/bar.png"
               alt="Bar da festa"
               loading="lazy"
-              data-title="Bar"
+              data-full-url="img/bar.png"
             />
           </div>
         </div>
 
       </section>
 
-      <!-- Modal (só vai ser usado no PC) -->
-      <div class="img-modal" id="img-modal" aria-hidden="true">
-        <div class="img-modal__backdrop" data-close="1"></div>
-
-        <div class="img-modal__content" role="dialog" aria-modal="true">
-          <button class="img-modal__close" type="button" data-close="1">
+      <!-- Modal de foto -->
+      <div class="photo-modal" id="photo-modal" aria-hidden="true">
+        <div class="photo-modal__backdrop" data-close="1"></div>
+        <div class="photo-modal__content">
+          <button class="photo-modal__close" type="button" data-close="1">
             ×
           </button>
-          <div class="img-modal__title" id="img-modal-title"></div>
-          <img id="img-modal-img" alt="" />
+          <img id="photo-modal-img" alt="" />
         </div>
       </div>
     </main>
@@ -189,5 +187,7 @@
     <footer class="footer">
       <p>Formatura Duda • Engenharia Computacional • UFJF</p>
     </footer>
+
+    <script src="js/home.js"></script>
   </body>
 </html>
