@@ -222,6 +222,12 @@
   margin-bottom: 0;
 }
 
+.home-info-content--centered {
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  display: block;
+}
+
 .info-card {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--border-soft);
@@ -229,6 +235,11 @@
   padding: 1.5rem;
   text-align: center;
   animation: fadeInUp 1s ease 1.4s backwards;
+}
+
+.info-card--local {
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .info-card--full {
@@ -270,6 +281,77 @@
   font-size: 0.85rem;
   color: #999;
   font-style: italic;
+}
+
+.info-card__parking {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(215, 68, 153, 0.2);
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+.info-card__warning {
+  display: block;
+  font-weight: 600;
+  color: var(--orange);
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+.info-card__recommendation {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  background: rgba(237, 88, 0, 0.08);
+  border-left: 3px solid var(--orange);
+  border-radius: 8px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.6;
+  text-align: left;
+}
+
+.info-card__recommendation strong {
+  color: var(--orange);
+  font-weight: 600;
+}
+
+/* Dress code looks */
+.info-card--dresscode {
+  grid-column: 1 / -1;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dresscode-looks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.dresscode-looks__item {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid rgba(215, 68, 153, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.dresscode-looks__item:hover {
+  border-color: var(--pink);
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(215, 68, 153, 0.2);
+}
+
+.dresscode-looks__item img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  max-height: 320px;
 }
 
 .info-card__link {
@@ -373,6 +455,19 @@
 
   .info-card--full {
     grid-column: 1;
+  }
+
+  .info-card--dresscode {
+    grid-column: 1;
+  }
+
+  .dresscode-looks {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .dresscode-looks__item img {
+    max-height: 240px;
   }
 
   .home-date-card {
