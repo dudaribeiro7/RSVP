@@ -424,63 +424,55 @@ function switchTab(tabName) {
   const guestsOnlyElements = document.querySelectorAll('.guests-only');
   const photosOnlyElements = document.querySelectorAll('.photos-only');
   const tablesOnlyElements = document.querySelectorAll('.tables-only');
-  
+  const checklistOnlyElements = document.querySelectorAll('.checklist-only');
+
   // Resetar todas as classes de visibilidade primeiro
   guestsOnlyElements.forEach(el => {
-    el.classList.remove('hidden-in-photos', 'hidden-in-tables');
+    el.classList.remove('hidden-in-photos', 'hidden-in-tables', 'hidden-in-checklist');
   });
   photosOnlyElements.forEach(el => {
-    el.classList.remove('hidden-in-guests', 'hidden-in-tables');
+    el.classList.remove('hidden-in-guests', 'hidden-in-tables', 'hidden-in-checklist');
   });
   tablesOnlyElements.forEach(el => {
-    el.classList.remove('hidden-in-guests', 'hidden-in-photos');
+    el.classList.remove('hidden-in-guests', 'hidden-in-photos', 'hidden-in-checklist');
   });
-  
+  checklistOnlyElements.forEach(el => {
+    el.classList.remove('hidden-in-guests', 'hidden-in-photos', 'hidden-in-tables');
+  });
+
+  // Esconder todos os filtros
+  guestsFilters?.classList.add('hidden');
+  photosFilters?.classList.add('hidden');
+  tablesFilters?.classList.add('hidden');
+
   // Aplicar classes específicas para cada aba
+  const hiddenClass = `hidden-in-${tabName}`;
+
+  if (tabName !== 'guests') {
+    guestsOnlyElements.forEach(el => el.classList.add(hiddenClass));
+  }
+  if (tabName !== 'photos') {
+    photosOnlyElements.forEach(el => el.classList.add(hiddenClass));
+  }
+  if (tabName !== 'tables') {
+    tablesOnlyElements.forEach(el => el.classList.add(hiddenClass));
+  }
+  if (tabName !== 'checklist') {
+    checklistOnlyElements.forEach(el => el.classList.add(hiddenClass));
+  }
+
   if (tabName === 'guests') {
     guestsFilters?.classList.remove('hidden');
-    photosFilters?.classList.add('hidden');
-    tablesFilters?.classList.add('hidden');
-    
-    // Esconder elementos de outras abas
-    photosOnlyElements.forEach(el => {
-      el.classList.add('hidden-in-guests');
-    });
-    tablesOnlyElements.forEach(el => {
-      el.classList.add('hidden-in-guests');
-    });
-    
+
   } else if (tabName === 'photos') {
-    guestsFilters?.classList.add('hidden');
     photosFilters?.classList.remove('hidden');
-    tablesFilters?.classList.add('hidden');
-    
-    // Esconder elementos de outras abas
-    guestsOnlyElements.forEach(el => {
-      el.classList.add('hidden-in-photos');
-    });
-    tablesOnlyElements.forEach(el => {
-      el.classList.add('hidden-in-photos');
-    });
-    
     setStatus('');
     loadPhotos();
-    
+
   } else if (tabName === 'tables') {
-    guestsFilters?.classList.add('hidden');
-    photosFilters?.classList.add('hidden');
     tablesFilters?.classList.remove('hidden');
-    
-    // Esconder elementos de outras abas
-    guestsOnlyElements.forEach(el => {
-      el.classList.add('hidden-in-tables');
-    });
-    photosOnlyElements.forEach(el => {
-      el.classList.add('hidden-in-tables');
-    });
-    
     setStatus('');
-    
+
     // Carregar dados de mesas
     if (allPeople.length === 0) {
       loadPeople()
@@ -494,6 +486,10 @@ function switchTab(tabName) {
     } else {
       loadTablesArrangement();
     }
+
+  } else if (tabName === 'checklist') {
+    setStatus('');
+    loadChecklist();
   }
 }
 
@@ -1307,4 +1303,165 @@ function handleSeatsInputChange(e) {
   
   tablesSeats[tableNum] = newSeats;
   renderTables();
+}
+
+/* ============================= */
+/*  LISTA DE PRESENÇA (CHECKLIST)*/
+/* ============================= */
+
+const CHECKLIST_STORAGE_KEY = 'CHECKLIST_ARRIVED';
+let checklistPeople = [];
+let arrivedSet = new Set();
+
+// Elementos do checklist
+const checklistList = document.getElementById('checklist-list');
+const checklistSearchInput = document.getElementById('checklist-search-input');
+const checklistArrivedEl = document.getElementById('checklist-arrived');
+const checklistPendingEl = document.getElementById('checklist-pending');
+const checklistTotalEl = document.getElementById('checklist-total');
+
+// Carregar estado do localStorage
+function loadArrivedState() {
+  try {
+    const saved = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+    if (saved) {
+      arrivedSet = new Set(JSON.parse(saved));
+    }
+  } catch { /* ignore */ }
+}
+
+// Salvar estado no localStorage
+function saveArrivedState() {
+  localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify([...arrivedSet]));
+}
+
+// Carregar dados do checklist
+async function loadChecklist() {
+  if (!checklistList) return;
+
+  loadArrivedState();
+
+  // Usa allGuests se já carregado, senão busca
+  if (allGuests.length === 0) {
+    try {
+      await loadGuests();
+    } catch { return; }
+  }
+
+  // Montar lista: confirmados + acompanhantes, com mesa
+  // Buscar arranjos de mesa
+  let guestTable = {};
+  let companionTable = {};
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/tables/arrangements`, {
+      headers: authedHeaders()
+    });
+    if (res.ok) {
+      const arrangements = await res.json();
+      // arrangements é { "mesa_number": ["guest_id", "companion_id", ...] }
+      for (const [tableNum, people] of Object.entries(arrangements)) {
+        for (const personId of people) {
+          if (!personId) continue;
+          if (personId.startsWith('guest_')) {
+            guestTable[personId.replace('guest_', '')] = tableNum;
+          } else if (personId.startsWith('companion_')) {
+            companionTable[personId.replace('companion_', '')] = tableNum;
+          }
+        }
+      }
+    }
+  } catch { /* sem mesa */ }
+
+  checklistPeople = [];
+
+  const confirmed = allGuests.filter(g => (g.rsvp_status || '').toUpperCase() === 'YES');
+
+  for (const g of confirmed) {
+    if (g.name) {
+      const mesa = guestTable[String(g.id)] || null;
+      checklistPeople.push({
+        id: `guest_${g.id}`,
+        name: g.name.trim(),
+        mesa: mesa ? `Mesa ${mesa}` : null,
+      });
+    }
+
+    for (const c of (g.companions || [])) {
+      if (c.name) {
+        const mesa = companionTable[String(c.id)] || null;
+        checklistPeople.push({
+          id: `companion_${c.id}`,
+          name: c.name.trim(),
+          mesa: mesa ? `Mesa ${mesa}` : null,
+        });
+      }
+    }
+  }
+
+  // Ordenar alfabeticamente
+  checklistPeople.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }));
+
+  renderChecklist();
+}
+
+// Renderizar checklist
+function renderChecklist() {
+  if (!checklistList) return;
+
+  const query = normalize(checklistSearchInput?.value || '');
+
+  const filtered = query
+    ? checklistPeople.filter(p => normalize(p.name).includes(query))
+    : checklistPeople;
+
+  if (filtered.length === 0) {
+    checklistList.innerHTML = `<div class="checklist-empty">${query ? 'Nenhum resultado encontrado.' : 'Nenhum convidado confirmado.'}</div>`;
+  } else {
+    checklistList.innerHTML = filtered.map((p, i) => {
+      const isChecked = arrivedSet.has(p.id);
+      return `
+        <div class="checklist-item ${isChecked ? 'checked' : ''}" data-person-id="${p.id}">
+          <div class="checklist-item__check">${isChecked ? '✓' : ''}</div>
+          <div class="checklist-item__number">${i + 1}.</div>
+          <div class="checklist-item__info">
+            <span class="checklist-item__name">${escapeHtml(p.name)}</span>
+            ${p.mesa ? `<span class="checklist-item__mesa">${escapeHtml(p.mesa)}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Event listeners
+    checklistList.querySelectorAll('.checklist-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const personId = item.dataset.personId;
+        if (arrivedSet.has(personId)) {
+          arrivedSet.delete(personId);
+        } else {
+          arrivedSet.add(personId);
+        }
+        saveArrivedState();
+        renderChecklist();
+      });
+    });
+  }
+
+  updateChecklistCards();
+}
+
+// Atualizar cards de resumo
+function updateChecklistCards() {
+  const total = checklistPeople.length;
+  const arrived = checklistPeople.filter(p => arrivedSet.has(p.id)).length;
+  const pending = total - arrived;
+
+  if (checklistArrivedEl) checklistArrivedEl.textContent = arrived;
+  if (checklistPendingEl) checklistPendingEl.textContent = pending;
+  if (checklistTotalEl) checklistTotalEl.textContent = total;
+}
+
+// Busca no checklist
+if (checklistSearchInput) {
+  checklistSearchInput.addEventListener('input', () => renderChecklist());
 }

@@ -59,15 +59,19 @@
             <span class="admin-tab__icon">🪑</span>
             <span class="admin-tab__label">Mesas</span>
           </button>
+          <button class="admin-tab" data-tab="checklist">
+            <span class="admin-tab__icon">📋</span>
+            <span class="admin-tab__label">Presença</span>
+          </button>
         </div>
 
         <div class="admin-actions">
-          <button class="btn-secondary guests-only photos-only hidden-in-tables" id="btn-refresh" type="button">Atualizar</button>
-          <button class="btn-secondary guests-only hidden-in-photos hidden-in-tables" id="btn-export-docx" type="button">Exportar DOCX</button>
-          <button class="btn-secondary guests-only hidden-in-photos hidden-in-tables" id="btn-export-pdf" type="button">Exportar PDF</button>
-          <button class="btn-secondary photos-only hidden-in-guests hidden-in-tables" id="btn-download-photos" type="button">⬇️ Baixar todas as fotos</button>
-          <button class="btn-secondary tables-only hidden-in-guests hidden-in-photos" id="btn-save-tables" type="button">💾 Salvar mesas</button>
-          <button class="btn-secondary tables-only hidden-in-guests hidden-in-photos" id="btn-clear-tables" type="button">🗑️ Limpar tudo</button>
+          <button class="btn-secondary guests-only photos-only hidden-in-tables hidden-in-checklist" id="btn-refresh" type="button">Atualizar</button>
+          <button class="btn-secondary guests-only hidden-in-photos hidden-in-tables hidden-in-checklist" id="btn-export-docx" type="button">Exportar DOCX</button>
+          <button class="btn-secondary guests-only hidden-in-photos hidden-in-tables hidden-in-checklist" id="btn-export-pdf" type="button">Exportar PDF</button>
+          <button class="btn-secondary photos-only hidden-in-guests hidden-in-tables hidden-in-checklist" id="btn-download-photos" type="button">⬇️ Baixar todas as fotos</button>
+          <button class="btn-secondary tables-only hidden-in-guests hidden-in-photos hidden-in-checklist" id="btn-save-tables" type="button">💾 Salvar mesas</button>
+          <button class="btn-secondary tables-only hidden-in-guests hidden-in-photos hidden-in-checklist" id="btn-clear-tables" type="button">🗑️ Limpar tudo</button>
           <button class="btn-secondary" id="btn-logout" type="button">Sair</button>
           <a class="btn-secondary" href="index.html">Voltar pro site</a>
         </div>
@@ -195,6 +199,39 @@
         <div id="photos-admin-gallery" class="photos-admin-gallery"></div>
       </section>
     </div>
+    <!-- TAB: Lista de Presença -->
+    <div class="tab-content hidden" id="tab-checklist">
+      <section class="admin-card" style="max-width:700px;">
+        <div class="admin-card__header">
+          <h2 class="admin-card__title">Lista de Presença</h2>
+        </div>
+
+        <!-- Cards de resumo -->
+        <div class="checklist-summary">
+          <div class="checklist-summary__card checklist-summary__card--arrived">
+            <div class="checklist-summary__number" id="checklist-arrived">0</div>
+            <div class="checklist-summary__label">Chegaram</div>
+          </div>
+          <div class="checklist-summary__card checklist-summary__card--pending">
+            <div class="checklist-summary__number" id="checklist-pending">0</div>
+            <div class="checklist-summary__label">Faltam</div>
+          </div>
+          <div class="checklist-summary__card checklist-summary__card--total">
+            <div class="checklist-summary__number" id="checklist-total">0</div>
+            <div class="checklist-summary__label">Total</div>
+          </div>
+        </div>
+
+        <!-- Barra de busca -->
+        <div class="checklist-search">
+          <input id="checklist-search-input" type="text" placeholder="Buscar pelo nome..." autocomplete="off">
+        </div>
+
+        <!-- Lista de presença -->
+        <div class="checklist-list" id="checklist-list"></div>
+      </section>
+    </div>
+
     <!-- TAB: Mesas -->
     <div class="tab-content hidden" id="tab-tables">
       <section class="admin-card">
