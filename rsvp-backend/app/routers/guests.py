@@ -19,9 +19,12 @@ from datetime import datetime
 from fastapi.responses import StreamingResponse
 
 from docx import Document
+from docx.shared import Pt, Cm
+from docx.oxml.ns import qn
 
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table as RLTable, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
 
 
@@ -205,8 +208,9 @@ def delete_guest(
     return
 
 
-def _confirmed_attendees_names(db: Session) -> list[str]:
-    # Pega quem confirmou (YES), inclui acompanhantes, e ordena alfabeticamente
+def _confirmed_attendees_with_tables(db: Session) -> list[str]:
+    """Retorna lista de strings 'Nome - Mesa X' (ou só 'Nome' se sem mesa),
+    ordenada alfabeticamente."""
     confirmed_guests = (
         db.query(models.Guest)
         .filter(models.Guest.rsvp_status == schemas.RSVPStatus.YES.value)
@@ -214,18 +218,31 @@ def _confirmed_attendees_names(db: Session) -> list[str]:
         .all()
     )
 
-    names: list[str] = []
+    # Monta mapa person_id -> table_number a partir de TableArrangement
+    arrangements = db.query(models.TableArrangement).all()
+    guest_table: dict[int, int] = {}
+    companion_table: dict[int, int] = {}
+    for a in arrangements:
+        if a.guest_id is not None:
+            guest_table[a.guest_id] = a.table_number
+        if a.companion_id is not None:
+            companion_table[a.companion_id] = a.table_number
+
+    entries: list[str] = []
     for g in confirmed_guests:
         if g.name:
-            names.append(g.name.strip())
+            tbl = guest_table.get(g.id)
+            label = f"{g.name.strip()} - Mesa {tbl}" if tbl else g.name.strip()
+            entries.append(label)
 
-        # acompanhantes (só existem quando YES no seu create_guest)
         for c in (g.companions or []):
             if c.name:
-                names.append(c.name.strip())
+                tbl = companion_table.get(c.id)
+                label = f"{c.name.strip()} - Mesa {tbl}" if tbl else c.name.strip()
+                entries.append(label)
 
-    # remove duplicados e ordena por casefold (alfabético “de verdade”)
-    unique = sorted(set(names), key=lambda s: s.casefold())
+    # remove duplicados e ordena por casefold
+    unique = sorted(set(entries), key=lambda s: s.casefold())
     return unique
 
 
@@ -234,17 +251,48 @@ def export_confirmed_docx(
     db: Session = Depends(get_db),
     admin: None = Depends(require_admin),
 ):
-    names = _confirmed_attendees_names(db)
+    names = _confirmed_attendees_with_tables(db)
 
     doc = Document()
     doc.add_heading("Convidados confirmados", level=1)
     doc.add_paragraph(f"Total: {len(names)}")
     doc.add_paragraph(f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    doc.add_paragraph("")
 
-    doc.add_paragraph("")  # espaço
+    # ---------- tabela invisível de 2 colunas ----------
+    half = (len(names) + 1) // 2          # coluna esquerda pega o item extra
+    col_left = names[:half]
+    col_right = names[half:]
 
-    for n in names:
-        doc.add_paragraph(n, style="List Number")
+    table = doc.add_table(rows=max(len(col_left), len(col_right)), cols=2)
+    table.autofit = True
+
+    # remove bordas da tabela (visual limpo)
+    tbl = table._tbl
+    tbl_pr = tbl.tblPr if tbl.tblPr is not None else tbl.makeelement(qn("w:tblPr"), {})
+    borders = tbl_pr.makeelement(qn("w:tblBorders"), {})
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        el = borders.makeelement(qn(f"w:{edge}"), {
+            qn("w:val"): "none", qn("w:sz"): "0",
+            qn("w:space"): "0", qn("w:color"): "auto",
+        })
+        borders.append(el)
+    tbl_pr.append(borders)
+    if tbl.tblPr is None:
+        tbl.insert(0, tbl_pr)
+
+    for i, row in enumerate(table.rows):
+        left_text = f"{i + 1}. {col_left[i]}" if i < len(col_left) else ""
+        right_text = f"{half + i + 1}. {col_right[i]}" if i < len(col_right) else ""
+        row.cells[0].text = left_text
+        row.cells[1].text = right_text
+
+        for cell in row.cells:
+            for p in cell.paragraphs:
+                p.paragraph_format.space_after = Pt(2)
+                p.paragraph_format.space_before = Pt(2)
+                for run in p.runs:
+                    run.font.size = Pt(10)
 
     bio = BytesIO()
     doc.save(bio)
@@ -263,7 +311,7 @@ def export_confirmed_pdf(
     db: Session = Depends(get_db),
     admin: None = Depends(require_admin),
 ):
-    names = _confirmed_attendees_names(db)
+    names = _confirmed_attendees_with_tables(db)
 
     bio = BytesIO()
     styles = getSampleStyleSheet()
@@ -277,8 +325,33 @@ def export_confirmed_pdf(
         Spacer(1, 16),
     ]
 
-    items = [ListItem(Paragraph(n, styles["Normal"])) for n in names]
-    story.append(ListFlowable(items, bulletType="1"))  # lista numerada
+    # ---------- tabela invisível de 2 colunas ----------
+    half = (len(names) + 1) // 2
+    col_left = names[:half]
+    col_right = names[half:]
+
+    style_normal = styles["Normal"]
+    table_data = []
+    for i in range(max(len(col_left), len(col_right))):
+        left = Paragraph(f"{i + 1}. {col_left[i]}", style_normal) if i < len(col_left) else ""
+        right = Paragraph(f"{half + i + 1}. {col_right[i]}", style_normal) if i < len(col_right) else ""
+        table_data.append([left, right])
+
+    page_w = A4[0] - 2 * 72  # largura útil (margens padrão 1 in = 72pt)
+    col_w = page_w / 2
+
+    t = RLTable(table_data, colWidths=[col_w, col_w])
+    t.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+        # sem bordas
+        ("LINEBELOW", (0, 0), (-1, -1), 0, "white"),
+        ("LINEABOVE", (0, 0), (-1, -1), 0, "white"),
+    ]))
+    story.append(t)
 
     pdf.build(story)
 
